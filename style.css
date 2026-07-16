@@ -1,16 +1,5 @@
-:root { --blue: #2563EB; --bg-glass: rgba(255, 255, 255, 0.75); }
-html.dark { --bg-glass: rgba(17, 24, 39, 0.75); }
 body { font-family: 'Inter', sans-serif; }
 .font-sora { font-family: 'Sora', sans-serif; }
-#header { backdrop-filter: blur(16px); background: var(--bg-glass); }
-.bs-badge { background: linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); transition: transform 0.3s; }
-.bs-badge:hover { transform: scale(1.1) rotate(8deg); }
-.form-focus { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15), 0 12px 30px rgba(0,0,0,0.12); border-color: var(--blue)!important; }
-button, a, select { transition: all 0.2s ease; }
-button:hover { transform: translateY(-2px); }
-.page { display: none; animation: fadeIn 0.5s ease; }
+.bs-badge { background: linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%); }
+.page { display: none; }
 .page.active { display: flex; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-.active-filter { color: var(--blue); border-bottom: 3px solid var(--blue); font-weight: 600; }
-.border { transition: all 0.3s ease; }
-.border:hover { box-shadow: 0 12px 28px rgba(0,0,0,0.08); transform: translateY(-3px); }
