@@ -5,7 +5,7 @@ body { font-family: 'Inter', sans-serif; }
 #header { backdrop-filter: blur(16px); background: var(--bg-glass); }
 .bs-badge { background: linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); transition: transform 0.3s; }
 .bs-badge:hover { transform: scale(1.1) rotate(8deg); }
-.form-focus { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15), 0 12px 30px rgba(0,0,0,0.12); border-color: var(--blue); }
+.form-focus { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15), 0 12px 30px rgba(0,0,0,0.12); border-color: var(--blue)!important; }
 button, a, select { transition: all 0.2s ease; }
 button:hover { transform: translateY(-2px); }
 .page { display: none; animation: fadeIn 0.5s ease; }
