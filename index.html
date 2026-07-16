@@ -1,40 +1,197 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baobab Search</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Baobab Search - Moteur de recherche</title>
+
+<meta name="description" content="Baobab Search, le moteur de recherche simple et élégant">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.logo-font {
+    font-family: 'Playfair Display', serif;
+}
+
+.bs-badge {
+    background: linear-gradient(to bottom, #10B981 33%, #FBBF24 33% 66%, #EF4444 66%);
+}
+
+.search-bar:focus-within {
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+    border-color:#10B981;
+}
+</style>
+
 </head>
 
-<body>
 
-<header>
-    <h1>Baobab Search</h1>
-    <p>Votre moteur de recherche simple et rapide</p>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col items-center justify-center px-4">
+
+
+<header class="absolute top-0 w-full flex justify-between p-6 text-sm text-gray-600">
+
+<div class="flex gap-6">
+<a href="#">À propos</a>
+<a href="#">Images</a>
+</div>
+
+<div class="flex gap-6">
+<a href="#">Connexion</a>
+</div>
+
 </header>
 
 
-<main>
 
-    <div class="search-box">
-        <input type="text" id="search" placeholder="Rechercher...">
-        <button onclick="search()">Chercher</button>
-    </div>
+<main class="flex flex-col items-center w-full">
 
-    <div id="result"></div>
+
+<h1 class="logo-font text-7xl md:text-8xl text-gray-900 mb-2">
+Baobab
+</h1>
+
+<p class="text-gray-500 mb-12 tracking-[0.3em] text-sm">
+SEARCH
+</p>
+
+
+
+<div class="search-bar w-[600px] max-w-[90%] h-16 border rounded-[32px] shadow-lg flex items-center px-6">
+
+<div class="bs-badge w-9 h-9 rounded-full flex items-center justify-center text-white font-bold mr-4">
+BS
+</div>
+
+
+<input id="searchInput"
+type="text"
+placeholder="Rechercher sur Baobab..."
+class="w-full outline-none text-lg"
+>
+
+
+</div>
+
+
+
+<div class="mt-8 flex gap-4">
+
+
+<button onclick="search()"
+class="bg-green-700 text-white px-6 py-3 rounded-full">
+Rechercher
+</button>
+
+
+<button class="bg-gray-100 px-6 py-3 rounded-full">
+J'ai de la chance
+</button>
+
+
+</div>
+
+
+<div id="results" class="mt-8 w-[600px] max-w-[90%]"></div>
+
 
 </main>
 
 
-<footer>
-    <p>© 2026 Baobab Search</p>
+
+
+<footer class="absolute bottom-0 w-full bg-gray-50 border-t">
+
+<div class="px-8 py-4 flex justify-between text-sm text-gray-600">
+
+<p>© 2026 Baobab Search</p>
+
+<p>Confidentialité</p>
+
+</div>
+
 </footer>
 
 
-<script src="script.js"></script>
+
+
+<script>
+
+const data = [
+{
+titre:"CV professionnel",
+description:"Créer un CV moderne et efficace",
+mots:"cv emploi travail"
+},
+
+{
+titre:"Formation informatique",
+description:"Apprendre le développement web",
+mots:"formation code programmation"
+},
+
+{
+titre:"Baobab Search",
+description:"Le moteur de recherche en développement",
+mots:"baobab search"
+}
+
+];
+
+
+function search(){
+
+let query=document.getElementById("searchInput").value.toLowerCase();
+
+let results=document.getElementById("results");
+
+
+let found=data.filter(item =>
+item.mots.includes(query)
+);
+
+
+
+if(found.length){
+
+results.innerHTML=found.map(item=>`
+
+<div class="bg-gray-100 p-4 rounded-xl mb-3">
+
+<h2 class="font-bold text-green-700">
+${item.titre}
+</h2>
+
+<p>${item.description}</p>
+
+</div>
+
+`).join("");
+
+}
+
+else{
+
+results.innerHTML="Aucun résultat trouvé";
+
+}
+
+
+}
+
+</script>
+
 
 </body>
-
-</html>
+    </html>
