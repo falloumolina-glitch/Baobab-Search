@@ -5,73 +5,6 @@ const CX = "COLLE_TON_CX_ICI";
 let recognition;
 let currentTab = 'all';
 
-// MENU FILTRE
-function filterMenu() {
-  const input = document.getElementById('menuSearch').value.toLowerCase();
-  const items = document.querySelectorAll('.menu-item');
-  items.forEach(item => {
-    const text = item.innerText.toLowerCase();
-    item.style.display = text.includes(input)? 'flex' : 'none';
-  });
-}
-
-// MET PREFIXE DANS BARRE
-function searchPrefix(prefix) {
-  toggleSidebar();
-  const input = document.getElementById('searchInput');
-  input.value = prefix;
-  input.focus();
-}
-
-// OUVRE CAMERA
-function openCamera() {
-  toggleSidebar();
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.capture = 'environment';
-  input.onchange = e => alert('Photo prise! Recherche par image arrive bientôt');
-  input.click();
-}
-
-function showHistory() {
-  toggleSidebar();
-  const history = JSON.parse(localStorage.getItem('baobabHistory') || '[]');
-  if(history.length === 0) return alert('Aucun historique');
-  document.getElementById('searchInput').value = history[0];
-  search();
-}
-
-function showTrending() {
-  toggleSidebar();
-  const trends = ["Actualités Sénégal", "Météo Dakar", "Foot", "IA 2026", "Crypto"];
-  document.getElementById('searchInput').value = trends[Math.floor(Math.random() * trends.length)];
-  search();
-}
-
-function startVoiceFromMenu() {
-  toggleSidebar();
-  startVoice();
-}
-
-function openTranslate() {
-  toggleSidebar();
-  const q = prompt("Colle le texte à traduire:");
-  if(q) {
-    document.getElementById('searchInput').value = `traduire ${q} en anglais`;
-    search();
-  }
-}
-
-function openCalculator() {
-  toggleSidebar();
-  const q = prompt("Tape ton calcul: ex: 25*4");
-  if(q) {
-    document.getElementById('searchInput').value = q;
-    search();
-  }
-}
-
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('-translate-x-full');
   document.getElementById('sidebarOverlay').classList.toggle('hidden');
@@ -85,7 +18,6 @@ function startVoice() {
   recognition.onstart = () => document.getElementById('micIcon').classList.add('text-red-500');
   recognition.onresult = (event) => {
     document.getElementById('searchInput').value = event.results[0][0].transcript;
-    saveToHistory(event.results[0][0].transcript);
     search();
   };
   recognition.onend = () => document.getElementById('micIcon').classList.remove('text-red-500');
@@ -145,12 +77,6 @@ function changeLanguage(lang) {
   localStorage.setItem('language', lang);
 }
 
-function saveToHistory(query) {
-  let history = JSON.parse(localStorage.getItem('baobabHistory') || '[]');
-  history = [query,...history.filter(h => h!== query)].slice(0, 10);
-  localStorage.setItem('baobabHistory', JSON.stringify(history));
-}
-
 async function search(e) {
   if(e) e.preventDefault();
   const {safeSearch} = getSettings();
@@ -158,13 +84,12 @@ async function search(e) {
   if(!q.trim()) return;
   if(API_KEY === "COLLE_TA_CLE_ICI") return alert('Colle la clé API dans script.js');
 
-  saveToHistory(q);
   showPage('resultsPage');
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('resultsList').innerHTML = '';
 
   let url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX}&q=${encodeURIComponent(q)}&safe=${safeSearch}`;
-  if(currentTab === 'images' || q.startsWith('image:')) url += '&searchType=image';
+  if(currentTab === 'images') url += '&searchType=image';
   if(currentTab === 'news') url += '&sort=date';
 
   try {
@@ -184,8 +109,7 @@ async function search(e) {
 
 function displayResults(items) {
   const list = document.getElementById('resultsList');
-  const q = document.getElementById('searchInput').value;
-  if(currentTab === 'images' || q.startsWith('image:')) {
+  if(currentTab === 'images') {
     list.className = 'grid grid-cols-3 gap-2';
     list.innerHTML = items.map(item => `
       <a href="${item.image.contextLink}" target="_blank" class="block">
