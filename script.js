@@ -1,9 +1,9 @@
-// BAOBAB IA-TECH SCRIPT.JS v3.0 PRO
+// BAOBAB IA-TECH SCRIPT.JS v3.1 FINAL
 
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
-  if(pageId === 'historyPage') loadHistory();
+  if(pageId === 'historyPage') loadHistory(); // Charge l'historique quand on ouvre la page
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -23,9 +23,9 @@ function getSettings() {
 }
 
 const fakeDB = {
-  "messi": { ai: "Lionel Messi est un footballeur argentin. 8 Ballons d'Or et vainqueur de la Coupe du Monde 2022.", results: [{url: "wikipedia.org", title: "Lionel Messi - Wikipédia", desc: "Lionel Andrés Messi est un footballeur international argentin."}] },
+  "messi": { ai: "Lionel Messi est un footballeur argentin. 8 Ballons d'Or et vainqueur de la Coupe du Monde 2022.", results: [{url: "wikipedia.org › wiki › Lionel_Messi", title: "Lionel Messi - Wikipédia", desc: "Lionel Andrés Messi est un footballeur international argentin."},{url: "mls.com › inter-miami", title: "Leo Messi | Inter Miami CF", desc: "Toutes les stats de Messi en MLS."}] },
   "baobab": { ai: "Le baobab est un arbre emblématique d'Afrique. Il peut vivre 1000 ans et stocker 120 000L d'eau.", results: [{url: "baobab.sn", title: "Baobab Search", desc: "Le premier moteur de recherche intelligent d'Afrique."}] },
-  "senegal": { ai: "Le Sénégal est un pays d'Afrique de l'Ouest. Capitale: Dakar.", results: [{url: "wikipedia.org", title: "Sénégal - Wikipédia", desc: "Le Sénégal est un pays d'Afrique de l'Ouest."}] },
+  "senegal": { ai: "Le Sénégal est un pays d'Afrique de l'Ouest. Capitale: Dakar. Monnaie: Franc CFA.", results: [{url: "wikipedia.org › wiki › Senegal", title: "Sénégal - Wikipédia", desc: "Le Sénégal est un pays d'Afrique de l'Ouest."}] },
   "default": { ai: "Je suis Baobab IA. Essayez 'messi', 'baobab' ou 'senegal'.", results: [] }
 };
 
@@ -33,7 +33,7 @@ function search(e) {
   if(e) e.preventDefault();
   const settings = getSettings();
   const query = document.getElementById('searchInput').value || document.getElementById('searchInput2').value;
-  if(!query) return;
+  if(!query.trim()) return;
 
   showPage('resultsPage');
   document.getElementById('searchInput2').value = query;
@@ -46,7 +46,7 @@ function search(e) {
 
   document.getElementById('aiSummary').style.display = settings.aiSummary? 'block' : 'none';
   document.getElementById('aiText').innerText = data.ai;
-  document.getElementById('resultCount').innerText = `Environ ${data.results.length} résultats`;
+  document.getElementById('resultCount').innerText = `Environ ${data.results.length} résultats pour "${query}"`;
 
   const list = document.getElementById('resultsList');
   list.innerHTML = '';
@@ -55,11 +55,12 @@ function search(e) {
     list.innerHTML += `<div class="mb-6"><div class="text-sm text-green-700 dark:text-green-400">${r.url}</div><a href="#" ${target} class="text-xl text-blue-700 hover:underline">${r.title}</a><p class="text-sm text-gray-700 dark:text-gray-300 mt-1">${r.desc}</p></div>`;
   });
 
+  // SAUVEGARDE DANS L'HISTORIQUE
   if(settings.saveHistory){
     let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    history = history.filter(item => item.query!== query);
-    history.unshift({query: query, date: new Date().toISOString()});
-    localStorage.setItem('searchHistory', JSON.stringify(history.slice(0, 20)));
+    history = history.filter(item => item.query.toLowerCase() !== query.toLowerCase()); // Evite les doublons
+    history.unshift({query: query, date: new Date().toISOString()}); // Ajoute en premier
+    localStorage.setItem('searchHistory', JSON.stringify(history.slice(0, 50))); // Garde 50 max
   }
 }
 
@@ -94,14 +95,38 @@ function clearHistory(){
   }
 }
 
+// NOUVEAU : AFFICHE TOUT L'HISTORIQUE
 function loadHistory(){
   const list = document.getElementById('historyList');
   const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-  if(history.length === 0){ list.innerHTML = "<p>Aucun historique</p>"; return; }
+  
+  if(history.length === 0){ 
+    list.innerHTML = "<p class='text-gray-500 dark:text-gray-400'>Aucune recherche pour le moment</p>"; 
+    return; 
+  }
+  
   list.innerHTML = '';
   history.forEach(item => {
-    list.innerHTML += `<div onclick="document.getElementById('searchInput').value='${item.query}'; search()" class="p-3 bg-gray-100 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700">${item.query}</div>`;
+    const date = new Date(item.date);
+    const formattedDate = date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+    
+    list.innerHTML += `
+      <div onclick="rerunSearch('${item.query}')" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 flex justify-between items-center">
+        <div>
+          <p class="font-medium">${item.query}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">${formattedDate}</p>
+        </div>
+        <span class="text-blue-600">→</span>
+      </div>
+    `;
   });
+}
+
+// NOUVEAU : RELANCER UNE RECHERCHE DEPUIS L'HISTORIQUE
+function rerunSearch(query){
+  document.getElementById('searchInput').value = query;
+  showPage('homePage');
+  search();
 }
 
 function applyTheme(theme) {
@@ -112,15 +137,16 @@ function applyTheme(theme) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const s = getSettings();
-  document.getElementById('safeSearch').checked = s.safeSearch;
-  document.getElementById('aiSummaryToggle').checked = s.aiSummary;
-  document.getElementById('openNewTab').checked = s.openNewTab;
-  document.getElementById('instantSearch').checked = s.instantSearch;
-  document.getElementById('resultsPerPage').value = s.resultsPerPage;
-  document.getElementById('region').value = s.region;
-  document.getElementById('language').value = s.language;
-  document.getElementById('saveHistory').checked = s.saveHistory;
-  document.getElementById('autoDelete').checked = s.autoDelete;
-  document.querySelector(`input[name="theme"][value="${s.theme}"]`).checked = true;
+  if(document.getElementById('safeSearch')) document.getElementById('safeSearch').checked = s.safeSearch;
+  if(document.getElementById('aiSummaryToggle')) document.getElementById('aiSummaryToggle').checked = s.aiSummary;
+  if(document.getElementById('openNewTab')) document.getElementById('openNewTab').checked = s.openNewTab;
+  if(document.getElementById('instantSearch')) document.getElementById('instantSearch').checked = s.instantSearch;
+  if(document.getElementById('resultsPerPage')) document.getElementById('resultsPerPage').value = s.resultsPerPage;
+  if(document.getElementById('region')) document.getElementById('region').value = s.region;
+  if(document.getElementById('language')) document.getElementById('language').value = s.language;
+  if(document.getElementById('saveHistory')) document.getElementById('saveHistory').checked = s.saveHistory;
+  if(document.getElementById('autoDelete')) document.getElementById('autoDelete').checked = s.autoDelete;
+  const themeRadio = document.querySelector(`input[name="theme"][value="${s.theme}"]`);
+  if(themeRadio) themeRadio.checked = true;
   applyTheme(s.theme);
 });
