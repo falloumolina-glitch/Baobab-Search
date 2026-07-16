@@ -11,54 +11,20 @@
 </head>
 <body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-inter pb-20">
 
-  <!-- MENU LATERAL GAUCHE AVEC RECHERCHE -->
-  <div id="sidebar" class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-50 -translate-x-full transition-transform duration-300 overflow-y-auto">
-    <div class="p-4 border-b dark:border-gray-800 flex items-center justify-between sticky top-0 bg-white dark:bg-gray-900">
+  <!-- MENU LATERAL GAUCHE SIMPLE -->
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-50 -translate-x-full transition-transform duration-300">
+    <div class="p-4 border-b dark:border-gray-800 flex items-center justify-between">
       <h2 class="font-sora text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-900 bg-clip-text text-transparent">Baobab</h2>
       <button onclick="toggleSidebar()" class="p-2">
         <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-
-    <div class="p-4">
-      <input id="menuSearch" type="text" onkeyup="filterMenu()" placeholder="Options..."
-        class="w-full bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none mb-3">
-    </div>
-
-    <nav id="menuOptions" class="px-4 space-y-1">
-      <button onclick="openCamera()" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>📷</span> <span>Caméra</span>
-      </button>
-      <button onclick="searchPrefix('image:')" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>🖼️</span> <span>Photo</span>
-      </button>
-      <button onclick="searchPrefix('filetype:pdf OR filetype:doc ')" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>📄</span> <span>Documents</span>
-      </button>
-      <button onclick="showHistory()" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>🕒</span> <span>Historique</span>
-      </button>
-      <button onclick="showTrending()" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>🔥</span> <span>Tendances</span>
-      </button>
-      <button onclick="startVoiceFromMenu()" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>🎤</span> <span>Recherche Vocale</span>
-      </button>
-      <button onclick="openTranslate()" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>🌍</span> <span>Traduire</span>
-      </button>
-      <button onclick="openCalculator()" class="menu-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left">
-        <span>🧮</span> <span>Calculatrice</span>
-      </button>
-    </nav>
-
-    <hr class="my-3 mx-4 dark:border-gray-800">
-    <div class="px-4 space-y-1">
+    <nav class="p-4 space-y-1">
       <button onclick="showPage('aboutPage')" class="w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">À propos</button>
       <button onclick="showPage('termsPage')" class="w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Conditions</button>
       <button onclick="showPage('privacyPage')" class="w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Confidentialité</button>
       <button onclick="showPage('settingsPage')" class="w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Paramètres</button>
-    </div>
+    </nav>
   </div>
   <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
 
@@ -159,7 +125,6 @@
       </button>
     </form>
   </div>
-  <input type="file" id="fileInput" class="hidden">
 
   <script src="script.js"></script>
 </body>
