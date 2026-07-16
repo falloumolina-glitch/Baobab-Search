@@ -19,7 +19,7 @@
   <section id="homePage" class="page active min-h-screen flex-col items-center justify-center pt-16 px-4">
     <h1 class="font-sora text-7xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 to-blue-900 bg-clip-text text-transparent">Baobab</h1>
     <p class="text-gray-500 dark:text-gray-400 mt-3 mb-12 text-lg" data-lang="subtitle">L'IA de la connaissance</p>
-    <form id="searchFormHome" onsubmit="search(event)" class="w-[600px] max-w-[95%] h-14 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-full shadow-lg flex items-center px-5">
+    <form id="searchFormHome" onsubmit="search(event)" class="w-[600px] max-w-[95%] h-14 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-full shadow-lg flex items-center px-5">
       <div class="bs-badge w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs mr-3">BS</div>
       <input id="searchInput" type="text" data-lang-placeholder="search_placeholder" placeholder="Demande à Baobab IA..." class="w-full outline-none bg-transparent text-base font-medium">
       <button type="submit" class="text-blue-600 hover:text-blue-800 text-xl">🔍</button>
@@ -40,7 +40,7 @@
 
   <section id="resultsPage" class="page pt-4 pb-20 flex-col">
     <div class="w-full max-w-7xl mx-auto px-6">
-      <form id="searchFormResults" onsubmit="search(event)" class="w-full max-w-[700px] h-12 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-800 rounded-full shadow-md flex items-center px-4">
+      <form id="searchFormResults" onsubmit="search(event)" class="w-full max-w-[700px] h-12 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-800 rounded-full shadow-md flex items-center px-4">
         <div class="bs-badge w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs mr-3">BS</div>
         <input id="searchInput2" type="text" class="w-full outline-none bg-transparent font-medium">
         <button type="submit" class="text-blue-600 text-lg">🔍</button>
@@ -63,8 +63,8 @@
     <h2 class="font-sora text-4xl font-bold mb-8" data-lang="settings_title">Paramètres</h2>
     <div class="border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-5 bg-white dark:bg-gray-900 shadow-sm">
       <h3 class="font-semibold text-xl mb-4" data-lang="search_settings">Recherche</h3>
-      <label class="flex items-center mt-4 cursor-pointer"><input type="checkbox" id="aiSummaryToggle" checked class="mr-3 w-5 h-5 accent-blue-600 rounded"><span data-lang="ai_summary">Afficher le résumé IA</span></label>
-      <label class="flex items-center mt-4 cursor-pointer"><input type="checkbox" id="openNewTab" checked class="mr-3 w-5 h-5 accent-blue-600 rounded"><span data-lang="new_tab">Ouvrir dans un nouvel onglet</span></label>
+      <label class="flex items-center mt-4 cursor-pointer"><input type="checkbox" id="aiSummaryToggle" class="mr-3 w-5 h-5 accent-blue-600 rounded"><span data-lang="ai_summary">Afficher le résumé IA</span></label>
+      <label class="flex items-center mt-4 cursor-pointer"><input type="checkbox" id="openNewTab" class="mr-3 w-5 h-5 accent-blue-600 rounded"><span data-lang="new_tab">Ouvrir dans un nouvel onglet</span></label>
       <div class="mt-4"><label class="block text-sm font-semibold mb-2" data-lang="results_per_page">Nombre de résultats</label><select id="resultsPerPage" class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-xl p-3 font-medium"><option value="10">10</option><option value="20">20</option></select></div>
     </div>
     <div class="border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-5 bg-white dark:bg-gray-900 shadow-sm">
@@ -73,7 +73,7 @@
     </div>
     <div class="border border-gray-200 dark:border-gray-800 rounded-2xl p-6 mb-5 bg-white dark:bg-gray-900 shadow-sm">
       <h3 class="font-semibold text-xl" data-lang="appearance">Apparence</h3>
-      <label class="flex items-center mt-4 cursor-pointer"><input type="radio" name="theme" value="light" checked class="mr-3 w-5 h-5 accent-blue-600"><span data-lang="light_theme">Thème Clair</span></label>
+      <label class="flex items-center mt-4 cursor-pointer"><input type="radio" name="theme" value="light" class="mr-3 w-5 h-5 accent-blue-600"><span data-lang="light_theme">Thème Clair</span></label>
       <label class="flex items-center mt-4 cursor-pointer"><input type="radio" name="theme" value="dark" class="mr-3 w-5 h-5 accent-blue-600"><span data-lang="dark_theme">Thème Sombre</span></label>
     </div>
     <button onclick="saveSettings()" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3.5 rounded-full font-bold hover:shadow-lg w-full text-lg" data-lang="save">Enregistrer</button>
@@ -88,9 +88,28 @@
     <button onclick="showPage('homePage')" class="mt-6 text-blue-600 hover:underline font-medium" data-lang="back_home">← Retour</button>
   </section>
 
-  <section id="aboutPage" class="page pt-24 max-w-4xl mx-auto px-6 pb-20 flex-col leading-relaxed"><h2 class="font-sora text-4xl font-bold mb-4" data-lang="about_title">À propos de Baobab</h2><p class="text-lg" data-lang="about_text">Baobab est le premier moteur de recherche intelligent d'Afrique. Fondé en 2026 à Dakar.</p><button onclick="showPage('homePage')" class="mt-8 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold">← Retour</button></section>
-  <section id="termsPage" class="page pt-24 max-w-4xl mx-auto px-6 pb-20 flex-col leading-relaxed"><h2 class="font-sora text-4xl font-bold mb-2">Conditions d'Utilisation</h2><p class="text-sm text-gray-500 mb-8">Licence MIT</p><button onclick="showPage('homePage')" class="mt-8 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold">← Retour</button></section>
-  <section id="privacyPage" class="page pt-24 max-w-4xl mx-auto px-6 pb-20 flex-col leading-relaxed"><h2 class="font-sora text-4xl font-bold mb-2">Politique de Confidentialité</h2><p class="text-sm text-gray-500 mb-8">Conforme RGPD</p><button onclick="showPage('homePage')" class="mt-8 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold">← Retour</button></section>
+  <section id="aboutPage" class="page pt-24 max-w-4xl mx-auto px-6 pb-20 flex-col leading-relaxed"><h2 class="font-sora text-4xl font-bold mb-4" data-lang="about_title">À propos de Baobab</h2><p class="text-lg" data-lang="about_text">Baobab est le premier moteur de recherche intelligent d'Afrique. Notre mission : donner accès à la connaissance du monde, avec la puissance de l'IA. Fondé en 2026 à Dakar, Sénégal.</p><button onclick="showPage('homePage')" class="mt-8 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold">← Retour</button></section>
+
+  <section id="termsPage" class="page pt-24 max-w-4xl mx-auto px-6 pb-20 flex-col leading-relaxed">
+    <h2 class="font-sora text-4xl font-bold mb-2">Conditions d'Utilisation</h2><p class="text-sm text-gray-500 mb-8">Dernière mise à jour : 04 Octobre 2026</p>
+    <div class="space-y-4 text-gray-700 dark:text-gray-300">
+      <p><b>1. Acceptation :</b> En utilisant Baobab, vous acceptez ces conditions.</p>
+      <p><b>2. Licence MIT :</b> Vous pouvez utiliser, copier et modifier ce code librement.</p>
+      <p><b>3. Responsabilité :</b> Les résultats IA sont donnés à titre informatif. Baobab n'est pas responsable des erreurs.</p>
+      <p><b>4. Contact :</b> contact@baobab.ai</p>
+    </div>
+    <button onclick="showPage('homePage')" class="mt-8 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold">← Retour</button>
+  </section>
+
+  <section id="privacyPage" class="page pt-24 max-w-4xl mx-auto px-6 pb-20 flex-col leading-relaxed">
+    <h2 class="font-sora text-4xl font-bold mb-2">Politique de Confidentialité</h2><p class="text-sm text-gray-500 mb-8">Conforme RGPD</p>
+    <div class="space-y-4 text-gray-700 dark:text-gray-300">
+      <p><b>1. Données :</b> Nous ne collectons aucune donnée. Tout est stocké sur votre appareil.</p>
+      <p><b>2. Cookies :</b> Uniquement pour le thème et la langue.</p>
+      <p><b>3. Vos droits :</b> Vous pouvez effacer votre historique à tout moment dans Paramètres.</p>
+    </div>
+    <button onclick="showPage('homePage')" class="mt-8 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold">← Retour</button>
+  </section>
 
   <script src="script.js"></script>
 </body>
