@@ -1,80 +1,118 @@
-<!-- ========== 3. PAGE PARAMETRES COMPLETE ========== -->
-  <section id="settingsPage" class="page pt-20 max-w-2xl mx-auto px-4 pb-20 flex-col">
-    <h2 class="font-sora text-3xl font-bold mb-6">Paramètres</h2>
+// ========== BAOBAB IA-TECH SCRIPT.JS v3.0 PRO ==========
 
-    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4 bg-white dark:bg-gray-800">
-      <h3 class="font-semibold text-lg mb-2">Recherche</h3>
-      <label class="flex items-center mt-3 cursor-pointer">
-        <input type="checkbox" id="safeSearch" class="mr-3 w-4 h-4 accent-blue-600">
-        <span>Activer SafeSearch</span>
-      </label>
-      <label class="flex items-center mt-3 cursor-pointer">
-        <input type="checkbox" id="aiSummaryToggle" checked class="mr-3 w-4 h-4 accent-blue-600">
-        <span>Afficher le résumé IA</span>
-      </label>
-      <label class="flex items-center mt-3 cursor-pointer">
-        <input type="checkbox" id="openNewTab" checked class="mr-3 w-4 h-4 accent-blue-600">
-        <span>Ouvrir les résultats dans un nouvel onglet</span>
-      </label>
-      <div class="mt-3">
-        <label class="block text-sm font-medium mb-1">Nombre de résultats par page</label>
-        <select id="resultsPerPage" class="w-full bg-gray-100 dark:bg-gray-700 border-none rounded p-2">
-          <option value="10">10 résultats</option>
-          <option value="20">20 résultats</option>
-          <option value="30">30 résultats</option>
-        </select>
-      </div>
-    </div>
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4 bg-white dark:bg-gray-800">
-      <h3 class="font-semibold text-lg mb-2">Région et Langue</h3>
-       <div class="mt-3">
-        <label class="block text-sm font-medium mb-1">Pays/Région</label>
-        <select id="region" class="w-full bg-gray-100 dark:bg-gray-700 border-none rounded p-2">
-          <option value="SN">Sénégal</option>
-          <option value="FR">France</option>
-          <option value="US">États-Unis</option>
-          <option value="MA">Maroc</option>
-        </select>
-      </div>
-      <div class="mt-3">
-        <label class="block text-sm font-medium mb-1">Langue de l'interface</label>
-        <select id="language" class="w-full bg-gray-100 dark:bg-gray-700 border-none rounded p-2">
-          <option value="fr">Français</option>
-          <option value="en">English</option>
-          <option value="ar">العربية</option>
-          <option value="wo">Wolof</option>
-        </select>
-      </div>
-    </div>
+const fakeDB = {
+  "messi": { ai: "Lionel Messi est un footballeur argentin. 8 Ballons d'Or.", results: [{url: "wikipedia.org", title: "Lionel Messi - Wikipédia", desc: "Lionel Andrés Messi est un footballeur international argentin."}] },
+  "baobab": { ai: "Le baobab est un arbre emblématique d'Afrique. Il peut vivre 1000 ans.", results: [{url: "baobab.sn", title: "Baobab Search", desc: "Le premier moteur de recherche intelligent d'Afrique."}] },
+  "default": { ai: "Je suis Baobab IA. Essayez 'messi' ou 'baobab'.", results: [] }
+};
 
-    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4 bg-white dark:bg-gray-800">
-      <h3 class="font-semibold text-lg">Apparence</h3>
-      <label class="flex items-center mt-3 cursor-pointer">
-        <input type="radio" name="theme" value="light" checked class="mr-3 w-4 h-4 accent-blue-600">
-        <span>Thème Clair</span>
-      </label>
-      <label class="flex items-center mt-3 cursor-pointer">
-        <input type="radio" name="theme" value="dark" class="mr-3 w-4 h-4 accent-blue-600">
-        <span>Thème Sombre</span>
-      </label>
-      <label class="flex items-center mt-3 cursor-pointer">
-        <input type="radio" name="theme" value="auto" class="mr-3 w-4 h-4 accent-blue-600">
-        <span>Thème Auto - Suit l'appareil</span>
-      </label>
-    </div>
+// RECUPERE TOUS LES PARAMETRES
+function getSettings() {
+  return {
+    safeSearch: localStorage.getItem('safeSearch') === 'true',
+    aiSummary: localStorage.getItem('aiSummary') !== 'false',
+    openNewTab: localStorage.getItem('openNewTab') !== 'false',
+    resultsPerPage: localStorage.getItem('resultsPerPage') || '10',
+    region: localStorage.getItem('region') || 'SN',
+    language: localStorage.getItem('language') || 'fr',
+    theme: localStorage.getItem('theme') || 'light',
+    saveHistory: localStorage.getItem('saveHistory') !== 'false'
+  };
+}
 
-    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6 bg-white dark:bg-gray-800">
-      <h3 class="font-semibold text-lg mb-2">Données et Confidentialité</h3>
-      <label class="flex items-center mt-3 cursor-pointer">
-        <input type="checkbox" id="saveHistory" checked class="mr-3 w-4 h-4 accent-blue-600">
-        <span>Enregistrer l'historique de recherche</span>
-      </label>
-      <button onclick="clearHistory()" class="text-red-600 hover:underline mt-3">Effacer l'historique et les paramètres</button>
-    </div>
+function search(e) {
+  e.preventDefault();
+  const settings = getSettings();
+  const query = document.getElementById('searchInput').value || document.getElementById('searchInput2').value;
+  if(!query) return;
 
-    <button onclick="saveSettings()" class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 w-full">Enregistrer</button>
-    <p id="saveMsg" class="text-green-600 text-center mt-3 hidden">✓ Paramètres enregistrés!</p>
+  showPage('resultsPage');
+  document.getElementById('searchInput2').value = query;
 
-    <button onclick="showPage('homePage')" class="mt-4 text-blue-600 hover:underline">← Retour à l'accueil</button>
-  </section>
+  // Applique le paramètre Langue/Région
+  document.documentElement.lang = settings.language;
+  
+  const data = fakeDB[query.toLowerCase()] || fakeDB['default'];
+  const maxResults = parseInt(settings.resultsPerPage);
+  const resultsToShow = data.results.slice(0, maxResults);
+
+  document.getElementById('aiSummary').style.display = settings.aiSummary ? 'block' : 'none';
+  document.getElementById('aiText').innerText = data.ai;
+  document.getElementById('resultCount').innerText = `Environ ${data.results.length} résultats pour "${query}"`;
+
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+  resultsToShow.forEach(r => {
+    const target = settings.openNewTab ? 'target="_blank"' : '';
+    list.innerHTML += `<div class="mb-6"><div class="text-sm text-green-700 dark:text-green-400">${r.url}</div><a href="#" ${target} class="text-xl text-blue-700 hover:underline">${r.title}</a><p class="text-sm text-gray-700 dark:text-gray-300 mt-1">${r.desc}</p></div>`;
+  });
+
+  // Sauvegarde l'historique si activé
+  if(settings.saveHistory){
+    let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    if(!history.includes(query)) history.unshift(query);
+    localStorage.setItem('searchHistory', JSON.stringify(history.slice(0, 10)));
+  }
+}
+
+function luckySearch(e) {
+  if(e) e.preventDefault();
+  document.getElementById('searchInput').value = 'baobab';
+  search(e);
+}
+
+function saveSettings() {
+  localStorage.setItem('safeSearch', document.getElementById('safeSearch').checked);
+  localStorage.setItem('aiSummary', document.getElementById('aiSummaryToggle').checked);
+  localStorage.setItem('openNewTab', document.getElementById('openNewTab').checked);
+  localStorage.setItem('resultsPerPage', document.getElementById('resultsPerPage').value);
+  localStorage.setItem('region', document.getElementById('region').value);
+  localStorage.setItem('language', document.getElementById('language').value);
+  localStorage.setItem('theme', document.querySelector('input[name="theme"]:checked').value);
+  localStorage.setItem('saveHistory', document.getElementById('saveHistory').checked);
+  
+  applyTheme(document.querySelector('input[name="theme"]:checked').value);
+  
+  document.getElementById('saveMsg').classList.remove('hidden');
+  setTimeout(() => document.getElementById('saveMsg').classList.add('hidden'), 2000);
+}
+
+function clearHistory(){
+  if(confirm("Effacer tout ?")){
+    localStorage.clear();
+    alert('Effacé');
+    location.reload();
+  }
+}
+
+function applyTheme(theme) {
+  if(theme === 'auto'){
+    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  if(theme === 'dark') document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+}
+
+// CHARGEMENT DES PARAMETRES
+document.addEventListener('DOMContentLoaded', () => {
+  const settings = getSettings();
+  
+  document.getElementById('safeSearch').checked = settings.safeSearch;
+  document.getElementById('aiSummaryToggle').checked = settings.aiSummary;
+  document.getElementById('openNewTab').checked = settings.openNewTab;
+  document.getElementById('resultsPerPage').value = settings.resultsPerPage;
+  document.getElementById('region').value = settings.region;
+  document.getElementById('language').value = settings.language;
+  document.getElementById('saveHistory').checked = settings.saveHistory;
+  
+  const themeRadio = document.querySelector(`input[name="theme"][value="${settings.theme}"]`);
+  if(themeRadio) themeRadio.checked = true;
+  
+  applyTheme(settings.theme);
+});
