@@ -1,47 +1,91 @@
-// MET TES CLES ICI - CACHEES AUX UTILISATEURS
+// MET TES CLES ICI
 const API_KEY = "COLLE_TA_CLE_ICI";
 const CX = "COLLE_TON_CX_ICI";
 
-const translations = {
-  fr: { all: "Tous", images: "Images", videos: "Vidéos", news: "Actualités", my_photos: "Mes Photos", my_docs: "Mes Documents", about: "À propos", terms: "Conditions", privacy: "Confidentialité", settings_title: "Paramètres", lang_region: "Langue & Région", appearance: "Apparence", light_theme: "Thème Clair", dark_theme: "Thème Sombre", save: "Enregistrer", saved: "✓ Paramètres enregistrés!", back: "← Retour", search_placeholder: "Recher sur Baobab...", ai_title: "✨ Résumé IA par Baobab", about_title: "À propos de Baobab Search", safe_off: "Désactivé", safe_medium: "Standard", safe_high: "Renforcé" }
-};
-
 let recognition;
 let currentTab = 'all';
-let searchPrefix = ''; // AJOUT: pour mettre "image:" ou "filetype:" dans la barre
+
+// MENU FILTRE
+function filterMenu() {
+  const input = document.getElementById('menuSearch').value.toLowerCase();
+  const items = document.querySelectorAll('.menu-item');
+  items.forEach(item => {
+    const text = item.innerText.toLowerCase();
+    item.style.display = text.includes(input)? 'flex' : 'none';
+  });
+}
+
+// MET PREFIXE DANS BARRE
+function searchPrefix(prefix) {
+  toggleSidebar();
+  const input = document.getElementById('searchInput');
+  input.value = prefix;
+  input.focus();
+}
+
+// OUVRE CAMERA
+function openCamera() {
+  toggleSidebar();
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.onchange = e => alert('Photo prise! Recherche par image arrive bientôt');
+  input.click();
+}
+
+function showHistory() {
+  toggleSidebar();
+  const history = JSON.parse(localStorage.getItem('baobabHistory') || '[]');
+  if(history.length === 0) return alert('Aucun historique');
+  document.getElementById('searchInput').value = history[0];
+  search();
+}
+
+function showTrending() {
+  toggleSidebar();
+  const trends = ["Actualités Sénégal", "Météo Dakar", "Foot", "IA 2026", "Crypto"];
+  document.getElementById('searchInput').value = trends[Math.floor(Math.random() * trends.length)];
+  search();
+}
+
+function startVoiceFromMenu() {
+  toggleSidebar();
+  startVoice();
+}
+
+function openTranslate() {
+  toggleSidebar();
+  const q = prompt("Colle le texte à traduire:");
+  if(q) {
+    document.getElementById('searchInput').value = `traduire ${q} en anglais`;
+    search();
+  }
+}
+
+function openCalculator() {
+  toggleSidebar();
+  const q = prompt("Tape ton calcul: ex: 25*4");
+  if(q) {
+    document.getElementById('searchInput').value = q;
+    search();
+  }
+}
 
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('-translate-x-full');
   document.getElementById('sidebarOverlay').classList.toggle('hidden');
 }
 
-// FIX PRINCIPAL: Quand on clique ça met dans la barre
-function uploadFile(type) {
-  toggleSidebar();
-  const input = document.getElementById('searchInput');
-
-  if(type === 'image') {
-    searchPrefix = 'image:'; // Google utilise ça
-    input.value = 'image:'; // Ça s'affiche dans la barre
-    input.placeholder = "Décris l'image que tu cherches...";
-    switchTab('images');
-  } else {
-    searchPrefix = 'filetype:pdf OR filetype:doc '; // Cherche docs
-    input.value = 'filetype:pdf OR filetype:doc ';
-    input.placeholder = "Tape le nom du document...";
-    switchTab('all');
-  }
-  input.focus();
-}
-
 function startVoice() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return;
+  if (!SpeechRecognition) return alert('Micro non supporté');
   recognition = new SpeechRecognition();
-  recognition.lang = getSettings().language + '-FR';
+  recognition.lang = 'fr-FR';
   recognition.onstart = () => document.getElementById('micIcon').classList.add('text-red-500');
   recognition.onresult = (event) => {
-    document.getElementById('searchInput').value = searchPrefix + event.results[0][0].transcript;
+    document.getElementById('searchInput').value = event.results[0][0].transcript;
+    saveToHistory(event.results[0][0].transcript);
     search();
   };
   recognition.onend = () => document.getElementById('micIcon').classList.remove('text-red-500');
@@ -50,20 +94,16 @@ function startVoice() {
 
 function switchTab(tab) {
   currentTab = tab;
-  if(tab === 'all') searchPrefix = '';
-
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove('border-blue-600', 'text-blue-600', 'font-semibold');
     btn.classList.add('border-transparent', 'text-gray-500');
   });
   document.getElementById(`tab-${tab}`).classList.add('border-blue-600', 'text-blue-600', 'font-semibold');
-
   if(document.getElementById('searchInput').value) search();
 }
 
 function showPage(pageId) {
-  document.getElementById('sidebar').classList.add('-translate-x-full');
-  document.getElementById('sidebarOverlay').classList.add('hidden');
+  toggleSidebar();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   if(pageId === 'settingsPage') loadSettingsUI();
@@ -103,14 +143,12 @@ function applyTheme(t) {
 
 function changeLanguage(lang) {
   localStorage.setItem('language', lang);
-  document.querySelectorAll('[data-lang]').forEach(el => {
-    const key = el.getAttribute('data-lang');
-    if(translations[key]) el.innerText = translations[key];
-  });
-  document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-lang-placeholder');
-    if(translations[key]) el.placeholder = translations[key];
-  });
+}
+
+function saveToHistory(query) {
+  let history = JSON.parse(localStorage.getItem('baobabHistory') || '[]');
+  history = [query,...history.filter(h => h!== query)].slice(0, 10);
+  localStorage.setItem('baobabHistory', JSON.stringify(history));
 }
 
 async function search(e) {
@@ -118,20 +156,16 @@ async function search(e) {
   const {safeSearch} = getSettings();
   const q = document.getElementById('searchInput').value;
   if(!q.trim()) return;
-  if(API_KEY === "COLLE_TA_CLE_ICI") return alert('Le dev doit coller la clé API dans script.js');
+  if(API_KEY === "COLLE_TA_CLE_ICI") return alert('Colle la clé API dans script.js');
 
+  saveToHistory(q);
   showPage('resultsPage');
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('resultsList').innerHTML = '';
 
   let url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX}&q=${encodeURIComponent(q)}&safe=${safeSearch}`;
-
-  if(currentTab === 'images' || q.startsWith('image:')) {
-    url += '&searchType=image';
-  }
-  if(currentTab === 'news') {
-    url += '&sort=date';
-  }
+  if(currentTab === 'images' || q.startsWith('image:')) url += '&searchType=image';
+  if(currentTab === 'news') url += '&sort=date';
 
   try {
     const res = await fetch(url);
@@ -171,7 +205,5 @@ function displayResults(items) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const s = getSettings();
-  changeLanguage(s.language);
-  applyTheme(s.theme);
+  applyTheme(getSettings().theme);
 });
