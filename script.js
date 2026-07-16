@@ -1,17 +1,38 @@
 const trends = [
   {q: "angleterre - argentine", n: "20 000+"},
   {q: "météo demain", n: "20 000+"},
-  {q: "météo", n: "10 000+"},
-  {q: "dette", n: "2 000+"},
   {q: "messi", n: "500+"},
   {q: "final coupe du monde 2026", n: "1 000+"}
 ];
 
-const fakeDB = {
-  "messi": { ai: "Lionel Messi est un footballeur argentin. 8 Ballons d'Or. Joue à l'Inter Miami.", results: [{url: "wikipedia.org › Lionel_Messi", title: "Lionel Messi - Wikipédia", desc: "Lionel Andrés Messi est un footballeur international argentin."}] },
-  "météo": { ai: "A Dakar il fait 32°C et ensoleillé aujourd'hui.", results: [{url: "meteo.sn", title: "Météo Dakar", desc: "Prévisions météo pour les 7 prochains jours."}] },
-  "default": { ai: `Voici les résultats pour "${q}"`, results: [{url: "baobab.sn", title: "Baobab IA", desc: "Le moteur de recherche intelligent d'Afrique."}] }
-};
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('-translate-x-full');
+  document.getElementById('sidebarOverlay').classList.toggle('hidden');
+}
+
+function uploadFile(type) {
+  const input = document.getElementById('fileInput');
+  input.accept = type === 'image'? 'image/*' : '*/*';
+  input.click();
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if(file) alert(`${type === 'image'? 'Photo' : 'Document'} sélectionné: ${file.name}`);
+  }
+}
+
+function takePhoto() {
+  const input = document.getElementById('fileInput');
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.click();
+}
+
+function startVoice() {
+  const mic = document.getElementById('micIcon');
+  mic.classList.add('text-red-500', 'animate-pulse');
+  alert('Reconnaissance vocale - Bientôt disponible');
+  setTimeout(() => mic.classList.remove('text-red-500', 'animate-pulse'), 1000);
+}
 
 function loadTrends() {
   const list = document.getElementById('trendsList');
@@ -27,6 +48,7 @@ function loadTrends() {
 }
 
 function showPage(pageId) {
+  toggleSidebar();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   if(pageId === 'settingsPage') loadSettingsUI();
@@ -37,6 +59,8 @@ function getSettings() {
     aiSummary: localStorage.getItem('aiSummary')!== 'false',
     openNewTab: localStorage.getItem('openNewTab')!== 'false',
     safeSearch: localStorage.getItem('safeSearch') === 'true',
+    autoComplete: localStorage.getItem('autoComplete') === 'true',
+    saveHistory: localStorage.getItem('saveHistory')!== 'false',
     resultsPerPage: localStorage.getItem('resultsPerPage') || '10',
     language: localStorage.getItem('language') || 'fr',
     theme: localStorage.getItem('theme') || 'light'
@@ -48,6 +72,8 @@ function loadSettingsUI() {
   document.getElementById('aiSummaryToggle').checked = s.aiSummary;
   document.getElementById('openNewTab').checked = s.openNewTab;
   document.getElementById('safeSearch').checked = s.safeSearch;
+  document.getElementById('autoComplete').checked = s.autoComplete;
+  document.getElementById('saveHistory').checked = s.saveHistory;
   document.getElementById('resultsPerPage').value = s.resultsPerPage;
   document.getElementById('language').value = s.language;
   document.querySelector(`input[name="theme"][value="${s.theme}"]`).checked = true;
@@ -64,23 +90,24 @@ function search(e) {
   const q = document.getElementById('searchInput').value;
   if(!q.trim()) return;
   showPage('resultsPage');
-  const data = fakeDB[q.toLowerCase()] || {ai: `Résumé IA pour: ${q}`, results: []};
   document.getElementById('aiSummary').style.display = s.aiSummary? 'block' : 'none';
-  document.getElementById('aiText').innerText = data.ai;
-  document.getElementById('resultCount').innerText = `${data.results.length} résultats`;
-  const list = document.getElementById('resultsList');
-  list.innerHTML = data.results.slice(0, s.resultsPerPage).map(r => `
-    <div><p class="text-xs text-green-700 dark:text-green-400">${r.url}</p><a href="#" ${s.openNewTab?'target="_blank"':''} class="text-lg text-blue-700 dark:text-blue-400 hover:underline font-medium">${r.title}</a><p class="text-sm text-gray-600 dark:text-gray-400">${r.desc}</p></div>
-  `).join('') || "<p>Aucun résultat</p>";
-  let h = JSON.parse(localStorage.getItem('searchHistory')) || [];
-  h.unshift({query: q, date: new Date().toLocaleString()});
-  localStorage.setItem('searchHistory', JSON.stringify(h.slice(0, 20)));
+  document.getElementById('aiText').innerText = `Résumé IA pour: ${q}`;
+  document.getElementById('resultCount').innerText = `1 résultat`;
+  document.getElementById('resultsList').innerHTML = `<div><p class="text-xs text-green-700">baobab.sn</p><a href="#" ${s.openNewTab?'target="_blank"':''} class="text-lg text-blue-700 hover:underline font-medium">Résultat pour ${q}</a></div>`;
+
+  if(s.saveHistory) {
+    let h = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    h.unshift({query: q, date: new Date().toLocaleString()});
+    localStorage.setItem('searchHistory', JSON.stringify(h.slice(0, 50)));
+  }
 }
 
 function saveSettings() {
   localStorage.setItem('aiSummary', document.getElementById('aiSummaryToggle').checked);
   localStorage.setItem('openNewTab', document.getElementById('openNewTab').checked);
   localStorage.setItem('safeSearch', document.getElementById('safeSearch').checked);
+  localStorage.setItem('autoComplete', document.getElementById('autoComplete').checked);
+  localStorage.setItem('saveHistory', document.getElementById('saveHistory').checked);
   localStorage.setItem('resultsPerPage', document.getElementById('resultsPerPage').value);
   localStorage.setItem('language', document.getElementById('language').value);
   localStorage.setItem('theme', document.querySelector('input[name="theme"]:checked').value);
@@ -90,13 +117,16 @@ function saveSettings() {
 }
 
 function clearHistory() {
-  if(confirm("Effacer tout l'historique?")) localStorage.removeItem('searchHistory');
+  if(confirm("Effacer tout l'historique?")) {
+    localStorage.removeItem('searchHistory');
+    alert('Historique effacé');
+  }
 }
 
 function applyTheme(t) {
   if(t === 'dark') document.documentElement.classList.add('dark');
   else if(t === 'light') document.documentElement.classList.remove('dark');
-  else { // auto
+  else {
     if(window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
   }
@@ -104,6 +134,5 @@ function applyTheme(t) {
 
 document.addEventListener('DOMContentLoaded', () => {
   loadTrends();
-  const s = getSettings();
-  applyTheme(s.theme);
+  applyTheme(getSettings().theme);
 });
