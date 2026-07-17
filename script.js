@@ -21,7 +21,6 @@ function getSettings() {
 }
 
 function saveSettings() {
-  // On sauvegarde tout
   localStorage.setItem('uiLanguage', document.getElementById('uiLanguage').value);
   localStorage.setItem('resultsLanguage', document.getElementById('resultsLanguage').value);
   localStorage.setItem('region', document.getElementById('region').value);
@@ -39,7 +38,6 @@ function saveSettings() {
   applyTheme();
   applyBarPosition();
   
-  // Message de confirmation
   document.getElementById('saveMsg').classList.remove('hidden');
   setTimeout(() => document.getElementById('saveMsg').classList.add('hidden'), 2000);
 }
@@ -86,7 +84,7 @@ function startVoice(iconId) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return alert('Voix non supportée');
   let recognition = new SpeechRecognition();
-  recognition.lang = getSettings().uiLanguage + '-FR';
+  recognition.lang = getSettings().uiLanguage;
   document.getElementById(iconId).classList.add('text-red-500', 'animate-pulse');
   recognition.onresult = (event) => {
     document.getElementById('searchInput').value = event.results[0][0].transcript;
@@ -94,6 +92,34 @@ function startVoice(iconId) {
   };
   recognition.onend = () => document.getElementById(iconId).classList.remove('text-red-500', 'animate-pulse');
   recognition.start();
+}
+
+function buildSearchUrl(query) {
+  const s = getSettings();
+  let url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  
+  // 1. Langue des résultats
+  if(s.resultsLanguage !== 'any') url += `&lr=lang_${s.resultsLanguage}`;
+  
+  // 2. Région
+  if(s.region !== 'world') url += `&gl=${s.region}`;
+  
+  // 3. Période
+  if(s.timeFilter !== 'any') url += `&tbs=qdr:${s.timeFilter}`;
+  
+  // 4. SafeSearch
+  if(s.safeSearch === 'on') url += `&safe=active`;
+  if(s.safeSearch === 'blur') url += `&safe=moderate`;
+  
+  // 5. Verbatim
+  if(s.verbatim) url += `&as_epq=${encodeURIComponent(query)}`;
+  
+  // 6. Onglets
+  if(currentTab === 'images') url += `&tbm=isch`;
+  if(currentTab === 'videos') url += `&tbm=vid`;
+  if(currentTab === 'news') url += `&tbm=nws`;
+  
+  return url;
 }
 
 function search(event) {
@@ -112,12 +138,14 @@ function search(event) {
   document.getElementById('searchInputResults').value = query;
   showPage('resultsPage');
   document.getElementById('resultCount').innerText = `Résultats pour "${query}"`;
-  document.getElementById('aiText').innerText = `Résumé IA pour: ${query}`;
+  document.getElementById('aiText').innerText = `Résumé IA pour: ${query} en ${s.resultsLanguage}`;
+  
+  const searchUrl = buildSearchUrl(query);
+  const target = s.openNewTab? '_blank' : '_self';
   
   let html = '';
   for(let i=1; i<=5; i++) {
-    const target = s.openNewTab? '_blank' : '_self';
-    html += `<div><a href="https://google.com/search?q=${query}" target="${target}" class="text-xl text-blue-700 hover:underline">${query} - Résultat ${i}</a><p class="text-sm text-green-700">baobab.com/resultat-${i}</p></div>`;
+    html += `<div><a href="${searchUrl}" target="${target}" class="text-xl text-blue-700 hover:underline">${query} - Résultat ${i}</a><p class="text-sm text-green-700">baobab.com/resultat-${i}</p></div>`;
   }
   document.getElementById('resultsList').innerHTML = html;
 }
