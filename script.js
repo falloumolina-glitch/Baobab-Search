@@ -13,6 +13,7 @@ function getSettings() {
     saveHistory: localStorage.getItem('saveHistory')!== 'false',
     personalization: localStorage.getItem('personalization') === 'true',
     safeSearch: localStorage.getItem('safeSearch') || 'off',
+    barPosition: localStorage.getItem('barPosition') || 'top',
     autocomplete: localStorage.getItem('autocomplete')!== 'false',
     openNewTab: localStorage.getItem('openNewTab') === 'true',
     voiceSearch: localStorage.getItem('voiceSearch')!== 'false',
@@ -29,11 +30,13 @@ function saveSettings() {
   localStorage.setItem('saveHistory', document.getElementById('saveHistory').checked);
   localStorage.setItem('personalization', document.getElementById('personalization').checked);
   localStorage.setItem('safeSearch', document.getElementById('safeSearch').value);
+  localStorage.setItem('barPosition', document.getElementById('barPosition').value);
   localStorage.setItem('autocomplete', document.getElementById('autocomplete').checked);
   localStorage.setItem('openNewTab', document.getElementById('openNewTab').checked);
   localStorage.setItem('voiceSearch', document.getElementById('voiceSearch').checked);
   localStorage.setItem('theme', document.getElementById('theme').value);
   applyTheme();
+  applyBarPosition();
   document.getElementById('saveMsg').classList.remove('hidden');
   setTimeout(() => document.getElementById('saveMsg').classList.add('hidden'), 2000);
 }
@@ -47,15 +50,21 @@ function applyTheme() {
   }
 }
 
+function applyBarPosition() {
+  const pos = getSettings().barPosition;
+  if(pos === 'bottom') {
+    document.getElementById('topBar').classList.add('hidden');
+    document.getElementById('bottomBar').classList.remove('hidden');
+  } else {
+    document.getElementById('topBar').classList.remove('hidden');
+    document.getElementById('bottomBar').classList.add('hidden');
+  }
+}
+
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
-}
-
-function quickTab(tab) { 
-  document.getElementById('searchInput').value = "tendance";
-  currentTab = tab; 
-  search(); 
+  window.scrollTo(0,0);
 }
 
 function switchTab(tab) {
@@ -63,12 +72,6 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('border-blue-600', 'text-blue-600', 'font-semibold'));
   document.getElementById(`tab-${tab}`).classList.add('border-blue-600', 'text-blue-600', 'font-semibold');
   if(currentQuery) search();
-}
-
-function randomSearch() { 
-  const arr = ["messi", "baobab", "dakar", "météo"]; 
-  document.getElementById('searchInput').value = arr[Math.floor(Math.random()*arr.length)]; 
-  search(); 
 }
 
 function takePhoto() { 
@@ -107,7 +110,7 @@ async function search(event) {
   if(!query) return;
 
   const s = getSettings();
-  if(s.verbatim) query = `"${query}"`; // Opérateur exact
+  if(s.verbatim) query = `"${query}"`;
 
   if(s.saveHistory) {
     let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
@@ -119,14 +122,14 @@ async function search(event) {
   document.getElementById('searchInputResults').value = query;
   showPage('resultsPage');
   document.getElementById('resultCount').innerText = `Résultats pour "${query}"`;
-  document.getElementById('aiText').innerText = `Résumé IA pour: ${query}. Astuce: utilisez site:, filetype:pdf, -mot, intitle:`;
+  document.getElementById('aiText').innerText = `Résumé IA pour: ${query}`;
 
   if(currentTab === 'videos') await searchYouTube(query);
   else {
     let html = '';
     for(let i=1; i<=5; i++) {
       const target = s.openNewTab? '_blank' : '_self';
-      html += `<div><a href="https://google.com/search?q=${query}" target="${target}" class="text-xl text-blue-700 hover:underline">${query} - Résultat ${i}</a><p class="text-sm text-green-700">baobab.com/resultat-${i}</p><p>Description pour "${query}". Utilisez les opérateurs avancés.</p></div>`;
+      html += `<div><a href="https://google.com/search?q=${query}" target="${target}" class="text-xl text-blue-700 hover:underline">${query} - Résultat ${i}</a><p class="text-sm text-green-700">baobab.com/resultat-${i}</p><p>Description pour "${query}".</p></div>`;
     }
     document.getElementById('resultsList').innerHTML = html;
   }
@@ -165,10 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('saveHistory').checked = s.saveHistory;
     document.getElementById('personalization').checked = s.personalization;
     document.getElementById('safeSearch').value = s.safeSearch;
+    document.getElementById('barPosition').value = s.barPosition;
     document.getElementById('autocomplete').checked = s.autocomplete;
     document.getElementById('openNewTab').checked = s.openNewTab;
     document.getElementById('voiceSearch').checked = s.voiceSearch;
     document.getElementById('theme').value = s.theme;
   }
   applyTheme();
+  applyBarPosition();
 });
