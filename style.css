@@ -1,5 +1,182 @@
-body { font-family: 'Inter', sans-serif; }
-.font-sora { font-family: 'Sora', sans-serif; }
-.page { display: none; }
-.page.active { display: block; }
-.tab-btn.active { border-color: #2563EB!important; color: #2563EB!important; }
+/* ===== BAOBAB SEARCH - STYLE.CSS ===== */
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* 1. PAGES */
+.page {
+  display: none;
+}
+.page.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 2. RTL POUR ARABE - TRÈS IMPORTANT */
+html[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+html[dir="rtl"] input,
+html[dir="rtl"] select,
+html[dir="rtl"] textarea {
+  text-align: right;
+  direction: rtl;
+}
+html[dir="rtl"].flex {
+  flex-direction: row-reverse;
+}
+html[dir="rtl"].space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+html[dir="rtl"].space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  margin-right: 1rem;
+  margin-left: 0;
+}
+html[dir="rtl"] select {
+  background-position: left 12px center;
+  padding-left: 40px;
+  padding-right: 12px;
+}
+html[dir="rtl"] #aiSummary {
+  border-left: none;
+  border-right: 4px solid #3b82f6;
+}
+html[dir="rtl"] #set_back_btn {
+  transform: scaleX(-1);
+  display: inline-block;
+}
+
+/* 3. TOP BAR */
+#topBar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* 4. INPUT RECHERCHE */
+#searchInput, #searchInputResults {
+  outline: none;
+}
+#searchInput:focus, #searchInputResults:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* 5. TABS */
+.tab-btn {
+  color: #6b7280;
+  padding-bottom: 8px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.tab-btn:hover {
+  color: #3b82f6;
+}
+.tab-btn.border-blue-600 {
+  color: #2563eb;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+.dark.tab-btn {
+  color: #9ca3af;
+}
+.dark.tab-btn.border-blue-600 {
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+/* 6. CARTES PARAMETRES */
+.bg-white.dark\:bg-gray-800 {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+.dark.bg-white.dark\:bg-gray-800 {
+  border: 1px solid #374151;
+}
+
+/* 7. FORMULAIRES */
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* 8. BOUTON GRADIENT */
+.bg-gradient-to-r {
+  background: linear-gradient(90deg, #2563eb 0%, #9333ea 100%);
+  transition: all 0.2s;
+}
+.bg-gradient-to-r:hover {
+  background: linear-gradient(90deg, #1d4ed8 0%, #7e22ce 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+/* 9. BOTTOM BAR */
+#bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #e5e7eb;
+}
+.dark #bottomBar {
+  border-top: 1px solid #374151;
+}
+
+/* 10. RESUME IA */
+#aiSummary {
+  border-left: 4px solid #3b82f6;
+}
+.dark #aiSummary {
+  border-color: #60a5fa;
+}
+
+/* 11. RESULTATS */
+#resultsList a {
+  transition: color 0.2s;
+}
+#resultsList a:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+.dark #resultsList a:hover {
+  color: #60a5fa;
+}
+
+/* 12. RESPONSIVE MOBILE */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 3rem!important;
+  }
+  #topBar {
+    padding: 12px!important;
+  }
+        }
