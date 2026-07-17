@@ -5,6 +5,8 @@ let recognition;
 
 function getSettings() {
   return {
+    userName: localStorage.getItem('userName') || '',
+    userEmail: localStorage.getItem('userEmail') || '',
     uiLanguage: localStorage.getItem('uiLanguage') || 'fr',
     resultsLanguage: localStorage.getItem('resultsLanguage') || 'any',
     region: localStorage.getItem('region') || 'sn',
@@ -17,11 +19,14 @@ function getSettings() {
     autocomplete: localStorage.getItem('autocomplete')!== 'false',
     openNewTab: localStorage.getItem('openNewTab') === 'true',
     voiceSearch: localStorage.getItem('voiceSearch')!== 'false',
+    twoFactor: localStorage.getItem('twoFactor') === 'true',
     theme: localStorage.getItem('theme') || 'system'
   }
 }
 
 function saveSettings() {
+  localStorage.setItem('userName', document.getElementById('userName').value);
+  localStorage.setItem('userEmail', document.getElementById('userEmail').value);
   localStorage.setItem('uiLanguage', document.getElementById('uiLanguage').value);
   localStorage.setItem('resultsLanguage', document.getElementById('resultsLanguage').value);
   localStorage.setItem('region', document.getElementById('region').value);
@@ -34,6 +39,7 @@ function saveSettings() {
   localStorage.setItem('autocomplete', document.getElementById('autocomplete').checked);
   localStorage.setItem('openNewTab', document.getElementById('openNewTab').checked);
   localStorage.setItem('voiceSearch', document.getElementById('voiceSearch').checked);
+  localStorage.setItem('twoFactor', document.getElementById('twoFactor').checked);
   localStorage.setItem('theme', document.getElementById('theme').value);
   applyTheme();
   applyBarPosition();
@@ -113,67 +119,4 @@ async function search(event) {
   if(s.verbatim) query = `"${query}"`;
 
   if(s.saveHistory) {
-    let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
-    history.unshift(query);
-    localStorage.setItem('searchHistory', JSON.stringify(history.slice(0,10)));
-  }
-
-  currentQuery = query;
-  document.getElementById('searchInputResults').value = query;
-  showPage('resultsPage');
-  document.getElementById('resultCount').innerText = `Résultats pour "${query}"`;
-  document.getElementById('aiText').innerText = `Résumé IA pour: ${query}`;
-
-  if(currentTab === 'videos') await searchYouTube(query);
-  else {
-    let html = '';
-    for(let i=1; i<=5; i++) {
-      const target = s.openNewTab? '_blank' : '_self';
-      html += `<div><a href="https://google.com/search?q=${query}" target="${target}" class="text-xl text-blue-700 hover:underline">${query} - Résultat ${i}</a><p class="text-sm text-green-700">baobab.com/resultat-${i}</p><p>Description pour "${query}".</p></div>`;
-    }
-    document.getElementById('resultsList').innerHTML = html;
-  }
-}
-
-async function searchYouTube(query) {
-  if(YOUTUBE_KEY === "COLLE_TA_CLE_ICI") {
-    document.getElementById('resultsList').innerHTML = "⚠️ Colle ta clé YouTube dans script.js ligne 1";
-    return;
-  }
-  try {
-    const url = buildSearchUrl(query);
-    const res = await fetch(url);
-    const data = await res.json();
-    let html = '<div class="grid grid-cols-2 gap-4">';
-    data.items.forEach(item => {
-      if(item.id.videoId){
-        const target = getSettings().openNewTab? '_blank' : '_self';
-        html += `<div class="cursor-pointer" onclick="window.open('https://youtube.com/watch?v=${item.id.videoId}', '${target}')"><img src="${item.snippet.thumbnails.medium.url}" class="rounded-lg w-full"><p class="text-sm mt-2">${item.snippet.title}</p></div>`;
-      }
-    });
-    html += '</div>';
-    document.getElementById('resultsList').innerHTML = html;
-  } catch(e) { document.getElementById('resultsList').innerHTML = "Erreur YouTube"; }
-}
-
-// CHARGEMENT
-document.addEventListener('DOMContentLoaded', () => {
-  const s = getSettings();
-  if(document.getElementById('uiLanguage')) {
-    document.getElementById('uiLanguage').value = s.uiLanguage;
-    document.getElementById('resultsLanguage').value = s.resultsLanguage;
-    document.getElementById('region').value = s.region;
-    document.getElementById('timeFilter').value = s.timeFilter;
-    document.getElementById('verbatim').checked = s.verbatim;
-    document.getElementById('saveHistory').checked = s.saveHistory;
-    document.getElementById('personalization').checked = s.personalization;
-    document.getElementById('safeSearch').value = s.safeSearch;
-    document.getElementById('barPosition').value = s.barPosition;
-    document.getElementById('autocomplete').checked = s.autocomplete;
-    document.getElementById('openNewTab').checked = s.openNewTab;
-    document.getElementById('voiceSearch').checked = s.voiceSearch;
-    document.getElementById('theme').value = s.theme;
-  }
-  applyTheme();
-  applyBarPosition();
-});
+    let history = JSON.parse
