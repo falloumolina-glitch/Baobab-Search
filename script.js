@@ -1,5 +1,5 @@
 // 1. COLLE TA CLÉ ICI
-const YOUTUBE_KEY = "AIzaSyD6aTPeBpKTBFNNT6LOaXbfmpMG7XWl2V4";
+const YOUTUBE_KEY = "COLLE_TA_CLE_ICI";
 const YOUTUBE_URL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=6&q=`;
 
 const translations = {
@@ -84,4 +84,4 @@ function quickSearch(query) {
 function loadTrends() {
   const list = document.getElementById('trendsList');
   if(list) list.innerHTML = trends.map(t => `<div onclick="quickSearch('${t.q}')" class="p-3 hover:bg-gray-100 cursor-pointer">${t.q} <span class="text-sm text-gray-500">${t.n}</span></div>`).join('');
-       }
+    }
