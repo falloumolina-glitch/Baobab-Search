@@ -3,12 +3,11 @@ const YOUTUBE_KEY = "COLLE_TA_CLE_ICI";
 const YOUTUBE_URL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=6&q=`;
 
 const translations = {
-  fr: { all: "Tous", images: "Images", videos: "Vidéos", news: "Actualités", about: "À propos", terms: "Conditions", privacy: "Confidentialité", settings_title: "Paramètres", lang_region: "Langue & Région", appearance: "Apparence", light_theme: "Thème Clair", dark_theme: "Thème Sombre", save: "Enregistrer", saved: "✓ Paramètres enregistrés!", back: "← Retour", search_placeholder: "Recher sur Baobab...", ai_title: "✨ Résumé IA par Baobab", ai_summary: "Résumé IA", new_tab: "Nouvel onglet", about_title: "À propos de Baobab Search", terms_title: "Conditions d'utilisation", privacy_title: "Politique de confidentialité" },
-  en: { all: "All", images: "Images", videos: "Videos", news: "News", about: "About", terms: "Terms", privacy: "Privacy", settings_title: "Settings", lang_region: "Language & Region", appearance: "Appearance", light_theme: "Light Theme", dark_theme: "Dark Theme", save: "Save", saved: "✓ Settings saved!", back: "← Back", search_placeholder: "Search on Baobab...", ai_title: "✨ AI Summary by Baobab", ai_summary: "AI Summary", new_tab: "New tab", about_title: "About Baobab Search", terms_title: "Terms of Service", privacy_title: "Privacy Policy" }
-  //... garde le reste de tes langues ici
+  fr: { all: "Tous", images: "Images", videos: "Vidéos", news: "Actualités", settings_title: "Paramètres", search_placeholder: "Recher sur Baobab..." },
+  en: { all: "All", images: "Images", videos: "Videos", news: "News", settings_title: "Settings", search_placeholder: "Search on Baobab..." }
 };
 
-const trends = [{q: "angleterre - argentine", n: "20 000+"},{q: "météo demain", n: "20 000+"},{q: "messi", n: "500+"}];
+const trends = [{q: "messi", n: "500+"},{q: "météo demain", n: "20 000+"}];
 let recognition;
 let currentTab = 'all';
 
@@ -16,17 +15,20 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('-translate-x-full');
   document.getElementById('sidebarOverlay').classList.toggle('hidden');
 }
+function takePhoto() {
+  document.getElementById('fileInput').click();
+}
 function startVoice() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return alert('Voix non supportée');
   recognition = new SpeechRecognition();
-  recognition.lang = getSettings().language === 'wo'? 'fr-FR' : getSettings().language + '-FR';
-  recognition.onstart = () => document.getElementById('micIcon').classList.add('text-red-500', 'animate-pulse');
+  recognition.lang = 'fr-FR';
+  recognition.onstart = () => document.getElementById('micIcon').classList.add('text-red-500');
   recognition.onresult = (event) => {
     document.getElementById('searchInput').value = event.results[0][0].transcript;
-    search(event);
+    search();
   };
-  recognition.onend = () => document.getElementById('micIcon').classList.remove('text-red-500', 'animate-pulse');
+  recognition.onend = () => document.getElementById('micIcon').classList.remove('text-red-500');
   recognition.start();
 }
 function switchTab(tab) {
@@ -39,17 +41,15 @@ function switchTab(tab) {
   search();
 }
 
-async function search(event) {
-  if(event) event.preventDefault(); // <-- C'EST ÇA QUI EMPÊCHE DE SAUTER
+async function search() {
   const query = document.getElementById('searchInput').value;
   if(!query) return;
-
   document.getElementById('results').innerHTML = "Chargement...";
 
   if(currentTab === 'videos') {
     await searchYouTube(query);
   } else {
-    document.getElementById('results').innerHTML = "Résultats pour: " + query;
+    document.getElementById('results').innerHTML = `Résultats pour: <b>${query}</b>`;
   }
 }
 
@@ -64,24 +64,32 @@ async function searchYouTube(query) {
     const data = await res.json();
     let html = '<div class="grid grid-cols-2 gap-4">';
     data.items.forEach(item => {
-      html += `
-        <div class="cursor-pointer" onclick="window.open('https://youtube.com/watch?v=${item.id.videoId}')">
-          <img src="${item.snippet.thumbnails.medium.url}" class="rounded-lg w-full">
-          <p class="text-sm mt-2">${item.snippet.title}</p>
-        </div>
-      `;
+      if(item.id.videoId){
+        html += `
+          <div class="cursor-pointer" onclick="window.open('https://youtube.com/watch?v=${item.id.videoId}')">
+            <img src="${item.snippet.thumbnails.medium.url}" class="rounded-lg w-full">
+            <p class="text-sm mt-2">${item.snippet.title}</p>
+          </div>
+        `;
+      }
     });
     html += '</div>';
     document.getElementById('results').innerHTML = html;
   } catch(e) {
-    document.getElementById('results').innerHTML = "Erreur YouTube: " + e;
+    document.getElementById('results').innerHTML = "Erreur: " + e;
   }
+}
+function loadTrends() {
+  const list = document.getElementById('trendsList');
+  if(list) list.innerHTML = trends.map(t => `<div onclick="quickSearch('${t.q}')" class="p-3 hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer">${t.q}</div>`).join('');
 }
 function quickSearch(query) {
   document.getElementById('searchInput').value = query;
   search();
 }
-function loadTrends() {
-  const list = document.getElementById('trendsList');
-  if(list) list.innerHTML = trends.map(t => `<div onclick="quickSearch('${t.q}')" class="p-3 hover:bg-gray-100 cursor-pointer">${t.q} <span class="text-sm text-gray-500">${t.n}</span></div>`).join('');
-    }
+
+// BLOQUE LE RECHARGEMENT DU FORM DEFINITIVEMENT
+document.getElementById('searchForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  search();
+});
