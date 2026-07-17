@@ -1,7 +1,7 @@
 body { font-family: 'Inter', sans-serif; }
 .font-sora { font-family: 'Sora', sans-serif; }
 .page { display: none; }
-.page.active { display: block; }
+.page.active { display: flex; flex-direction: column; }
 html[dir="rtl"] { direction: rtl; text-align: right; }
 html[dir="rtl"] input, html[dir="rtl"] select { text-align: right; }
-html[dir="rtl"] #set_back_btn { transform: scaleX(-1); display: inline-block; }
+.contrast-high { filter: contrast(1.5); }
