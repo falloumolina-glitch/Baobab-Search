@@ -1,19 +1,16 @@
-/* TYPOGRAPHIE */
 body { font-family: 'Inter', sans-serif; color: #475569; }
 .font-sora { font-family: 'Sora', sans-serif; font-weight: 700; color: #1E293B; }
-
-/* BOUTONS */
 .btn-primary { background-color: #2563EB; color: white; }
 .btn-primary:hover { background-color: #1D4ED8; }
-.btn-secondary { background-color: #F1F5F9; color: #2563EB; border: 1px solid #CBD5E1; }
+.btn-secondary { background-color: #F1F5F9; color: #1E293B; border: 1px solid #CBD5E1; }
 .btn-secondary:hover { background-color: #E2E8F0; }
-
-/* LAYOUT */
 .page { display: none; }
-.page.active { display: block; }
+.page.active { display: flex; }
 .pointer-events-none { pointer-events: none; }
 .tab-btn.active { border-color: #2563EB!important; color: #2563EB!important; }
-
-/* CARTES RESULTATS */
-.result-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-.dark .result-card { background: #1E293B; }
+.result-card { margin-bottom: 24px; }
+.result-title { color: #2563EB; font-size: 18px; }
+.result-title:hover { text-decoration: underline; }
+.result-url { color: #008000; font-size: 14px; }
+.result-snippet { color: #475569; font-size: 14px; }
+.result-snippet b { font-weight: 600; color: #1E293B; }
