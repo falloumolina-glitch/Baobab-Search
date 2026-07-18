@@ -1,4 +1,5 @@
 const $ = s => document.querySelector(s);
+let currentLang = localStorage.getItem('baobabLang') || 'fr-FR';
 
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -8,6 +9,7 @@ function showPage(id) {
 function goHome() {
   showPage('home');
   loadHistory();
+  if($('#langSelect')) $('#langSelect').value = currentLang;
 }
 
 function showSuggestions() {
@@ -30,71 +32,68 @@ function search() {
   showPage('results');
   $('#resultsList').innerHTML = `
   <div class="result-card">
-    <div class="url">wikipedia.org › wiki › ${q.replace(' ', '_')}</div>
+    <div class="url">Langue: ${currentLang}</div>
     <a class="title">Résultat pour <b>${q}</b> - Baobab Search</a>
-    <div class="desc">Voici les informations concernant <b>${q}</b>. L'histoire du <b>Sénégal</b> s'étend sur plusieurs millénaires...</div>
+    <div class="desc">Résultats affichés en ${currentLang}</div>
   </div>`;
 }
 
-// ===== MICRO FONCTIONNEL =====
+// ===== MICRO MULTILINGUE 100% =====
 let recognition;
-
 function startVoice() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
   if (!SpeechRecognition) {
     alert("La reconnaissance vocale n'est pas supportée. Utilise Chrome sur Android.");
     return;
   }
-
   recognition = new SpeechRecognition();
-  recognition.lang = 'fr-FR'; // Français
+  recognition.lang = currentLang; // Utilise la langue choisie
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
   recognition.onstart = function() {
     $('#searchInput').placeholder = "Parlez maintenant...";
   };
-
   recognition.onresult = function(event) {
     const speechResult = event.results[0][0].transcript;
-    $('#searchInput').value = speechResult; // ECRIT DANS LA BARRE
+    $('#searchInput').value = speechResult;
     $('#searchInput').placeholder = "Recher sur Baobab...";
-    search(); // lance la recherche direct
+    search();
   };
-
   recognition.onerror = function(event) {
     alert('Erreur micro: ' + event.error);
     $('#searchInput').placeholder = "Recher sur Baobab...";
   };
-
   recognition.onend = function() {
     $('#searchInput').placeholder = "Recher sur Baobab...";
   };
-
-  recognition.start(); // LANCE
+  recognition.start();
 }
 
+// ===== RECHERCHE PAR IMAGE =====
 function startImageSearch() {
-  // Crée un input fichier invisible pour ouvrir la caméra/galerie
   let input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
-  input.capture = 'environment'; // ouvre la caméra direct sur mobile
-
+  input.capture = 'environment';
   input.onchange = e => {
     let file = e.target.files[0];
     if (!file) return;
-
-    // Pour l’instant on met "recherche par image" dans la barre
     $('#searchInput').value = "recherche par image: " + file.name;
-    search(); // lance la recherche
-
-    // Plus tard on pourra envoyer l’image à Google Lens ou TinEye
+    search();
   };
+  input.click();
+}
 
-  input.click(); // ouvre la caméra
-    }
+// ===== SAUVEGARDE LANGUE =====
+document.addEventListener('DOMContentLoaded', () => {
+  if($('#langSelect')){
+    $('#langSelect').addEventListener('change', (e) => {
+      currentLang = e.target.value;
+      localStorage.setItem('baobabLang', currentLang);
+    });
+  }
+});
 
 function saveHistory(q) {
   if(!$('#saveActivity')?.checked) return;
@@ -123,14 +122,10 @@ function setFontSize(s) {
   document.body.style.fontSize = s;
 }
 
-// Pour lancer avec Entrée
 function handleKeyPress(event) {
-  if (event.key === 'Enter') {
-    search();
-  }
+  if (event.key === 'Enter') { search(); }
 }
 
-// Fermer suggestions en cliquant dehors
 document.addEventListener('click', (e) => {
   if(!e.target.closest('.search-bar') &&!e.target.closest('.suggestions')) {
     $('#suggestions').classList.add('hidden');
