@@ -1,70 +1,69 @@
-const suggestions = ["météo louga", "messi", "actualités sénégal", "traduction", "calculatrice"];
 let currentTab = 'all';
 
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('translate-x-full'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); }
-function goHome() { showPage('homePage'); document.getElementById('mainHeader').classList.add('hidden'); }
-function showPage(pageId) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); }
-
-function clearInput(id) { document.getElementById(id).value = ''; document.getElementById(id==='searchInput'?'clearBtn':'clearBtnHeader').classList.add('hidden'); }
-document.getElementById('searchInput').oninput = (e) => { document.getElementById('clearBtn').classList.toggle('hidden', !e.target.value); }
-document.getElementById('searchInputHeader').oninput = (e) => { document.getElementById('clearBtnHeader').classList.toggle('hidden', !e.target.value); }
-
-function showAutocomplete(val, inputId='searchInputHeader') {
-  const list = inputId==='searchInput'? 'autocompleteListHome' : 'autocompleteList';
-  const el = document.getElementById(list);
-  if(val.length < 3) { el.classList.add('hidden'); return; }
-  const filtered = suggestions.filter(s => s.includes(val.toLowerCase()));
-  el.innerHTML = filtered.map(s => `<div onclick="selectSuggestion('${s}', '${inputId}')" class="p-3 hover:bg-[#F1F5F9] cursor-pointer">${s}</div>`).join('');
-  el.classList.toggle('hidden', filtered.length===0);
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
 }
-function selectSuggestion(s, inputId) { document.getElementById(inputId).value = s; search(); }
+function goHome() { showPage('homePage'); }
 
 function search(e) {
   if(e) e.preventDefault();
-  const query = document.getElementById('searchInput').value || document.getElementById('searchInputHeader').value;
+  const query = document.getElementById('searchInput')?.value || document.getElementById('searchInputResults')?.value;
   if(!query) return;
-  
-  showProgress(true);
-  if(!navigator.onLine) { document.getElementById('offlineMsg').classList.remove('hidden'); showProgress(false); return; }
-  
+  document.getElementById('searchInputResults').value = query;
   showPage('resultsPage');
-  document.getElementById('mainHeader').classList.remove('hidden');
-  document.getElementById('searchInputHeader').value = query;
-  document.getElementById('offlineMsg').classList.add('hidden');
-  
-  // PANNEAU INSTANTANE
-  const panel = document.getElementById('instantPanel');
-  if(query.includes('météo')) { panel.classList.remove('hidden'); document.getElementById('instantText').innerText = "Météo à Louga: 32°C, Ensoleillé"; }
-  else { panel.classList.add('hidden'); }
-
-  // RESULTATS FAKE
-  setTimeout(() => {
-    document.getElementById('resultsList').innerHTML = `
-      <div class="result-card">
-        <p class="result-url">https://exemple.com › page</p>
-        <h3 class="result-title cursor-pointer" onclick="window.open('https://exemple.com')">Titre du résultat pour <b>${query}</b></h3>
-        <p class="result-snippet">Ceci est un extrait avec le mot-clé <b>${query}</b> en gras pour la pertinence. <button onclick="shareLink('https://exemple.com')" class="text-[#2563EB] ml-2">Partager</button></p>
-      </div>
-      <div class="result-card">
-        <p class="result-url">https://test.com › info</p>
-        <h3 class="result-title">Deuxième résultat concernant <b>${query}</b></h3>
-        <p class="result-snippet">Un autre snippet pertinent pour votre recherche. <button onclick="shareLink('https://test.com')" class="text-[#2563EB] ml-2">Partager</button></p>
-      </div>
-    `;
-    if(document.getElementById('saveHistory').checked) saveToHistory(query);
-    showProgress(false);
-  }, 600);
+  loadResults(query);
 }
 
-function imFeelingLucky() { document.getElementById('searchInput').value = "messi"; search(); }
-function switchTab(tab) { currentTab = tab; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(`tab-${tab}`).classList.add('active'); search(); }
-function shareLink(url) { if(navigator.share) navigator.share({title: 'Baobab', url: url}); else navigator.clipboard.writeText(url); alert('Lien copié'); }
-function saveToHistory(q) { let hist = JSON.parse(localStorage.getItem('history')||'[]'); hist.unshift(q); localStorage.setItem('history', JSON.stringify(hist.slice(0,10))); }
-function clearHistory() { localStorage.removeItem('history'); alert('Historique effacé'); }
-function showProgress(show) { document.getElementById('progressBar').style.width = show ? '100%' : '0%'; }
-function startVoice() { alert('Recherche vocale'); }
-function takePhoto() { document.getElementById('fileInput').click(); }
-function changeLanguage(lang) { localStorage.setItem('language', lang); }
+function loadResults(query) {
+  // BAOBAB AI
+  if(currentTab === 'ai' || query.includes('?')) {
+    document.getElementById('aiBox').classList.remove('hidden');
+    document.getElementById('aiAnswer').innerText = `Réponse IA pour: ${query}. Je peux résumer, traduire et expliquer.`;
+  } else { document.getElementById('aiBox').classList.add('hidden'); }
 
-window.addEventListener('online', () => document.getElementById('offlineMsg').classList.add('hidden'));
-window.addEventListener('offline', () => document.getElementById('offlineMsg').classList.remove('hidden'));
+  // RESULTATS FAKE
+  document.getElementById('resultsList').innerHTML = `
+    <div class="result-item">
+      <div class="flex items-center gap-2 mb-1"><div class="w-4 h-4 rounded-full bg-[#F1F3F4]"></div><span class="result-url">exemple.com › article</span><span class="text-xs text-[#5F6368]">2 heures</span></div>
+      <h3 class="result-title cursor-pointer" onclick="alert('Ouvrir lien')">Titre du résultat pour ${query}</h3>
+      <p class="result-desc">Description du résultat avec <b>${query}</b> en gras. Date, icône et actions disponibles.</p>
+    </div>
+  `;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+
+  const pages = {images: 'imagesPage', videos: 'videosPage', news: 'newsPage', maps: 'mapsPage', shopping: 'shoppingPage', ai: 'aiPage'};
+  if(pages[tab]) showPage(pages[tab]); else showPage('resultsPage');
+  search();
+}
+
+function showAutocomplete(val) {
+  const list = document.getElementById('autocompleteList');
+  if(val.length < 2) { list.classList.add('hidden'); return; }
+  const sug = ['météo', 'actualités', 'traduction', 'calcul'].filter(s => s.startsWith(val));
+  list.innerHTML = sug.map(s => `<div onclick="selectSug('${s}')" class="p-3 hover:bg-[#F1F3F4] dark:hover:bg-[#3C4043] cursor-pointer">${s}</div>`).join('');
+  list.classList.remove('hidden');
+}
+function selectSug(s) { document.getElementById('searchInput').value = s; search(); }
+
+function startVoice() { alert('Recherche vocale activée'); }
+function takePhoto() { document.getElementById('fileInput').click(); }
+function setTheme(theme) {
+  if(theme === 'dark') document.documentElement.classList.add('dark');
+  else if(theme === 'light') document.documentElement.classList.remove('dark');
+  else { if(window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark'); }
+  localStorage.setItem('theme', theme);
+}
+function clearData() { localStorage.clear(); alert('Données supprimées'); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const theme = localStorage.getItem('theme') || 'system';
+  document.getElementById('themeSelect').value = theme;
+  setTheme(theme);
+});
