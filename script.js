@@ -76,8 +76,25 @@ function startVoice() {
 }
 
 function startImageSearch() {
-  alert('Recherche par image bientôt disponible');
-}
+  // Crée un input fichier invisible pour ouvrir la caméra/galerie
+  let input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment'; // ouvre la caméra direct sur mobile
+
+  input.onchange = e => {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    // Pour l’instant on met "recherche par image" dans la barre
+    $('#searchInput').value = "recherche par image: " + file.name;
+    search(); // lance la recherche
+
+    // Plus tard on pourra envoyer l’image à Google Lens ou TinEye
+  };
+
+  input.click(); // ouvre la caméra
+    }
 
 function saveHistory(q) {
   if(!$('#saveActivity')?.checked) return;
