@@ -1,6 +1,9 @@
 // ========================================
-// BAOBAB SEARCH - VERSION 100% GRATUITE SANS CLÉ
+// BAOBAB SEARCH - VERSION GOOGLE GEMINI
 // ========================================
+
+// 1. COLLE TA CLÉ GOOGLE CLOUD ICI
+const GEMINI_API_KEY = "COLLE_TA_CLE_GOOGLE_ICI";
 
 let currentLang = 'fr';
 let currentSecurity = 'balanced';
@@ -10,8 +13,8 @@ const $ = (id) => document.getElementById(id);
 
 // TRADUCTIONS
 const translations = {
-  fr: { title: "Baobab Search", tagline: "La recherche africaine, intelligente et respectueuse.", placeholder: "Pose ta question à Baobab...", searching: "Recherche en cours...", aiTitle: "Baobab IA", aiThink: "Baobab réfléchit à partir de Wikipedia...", aiBtn: "Demander à Baobab IA", aiSources: "Sources", footer: "Fait avec ❤️ pour l'Afrique. 100% Gratuit, 0 clé API." },
-  wo: { title: "Baobab Seet", tagline: "Seetug Afrik bi, xel te jàmm.", placeholder: "Laj Baobab...", searching: "Dii seet...", aiTitle: "Baobab AI", aiThink: "Baobab di xalaat...", aiBtn: "Laj Baobab AI", aiSources: "Lëndëm yi", footer: "Def nañ ko ak bégg. Baobab, garab xam-xam. Free 100%." }
+  fr: { title: "Baobab Search", tagline: "La recherche africaine, intelligente et respectueuse.", placeholder: "Pose ta question à Baobab...", searching: "Recherche en cours...", aiTitle: "Baobab IA", aiThink: "Réflexion de Baobab IA...", aiBtn: "Demander à Baobab IA", aiSources: "Sources", footer: "Fait avec ❤️ pour l'Afrique. Powered by Google Gemini." },
+  wo: { title: "Baobab Seet", tagline: "Seetug Afrik bi, xel te jàmm.", placeholder: "Laj Baobab...", searching: "Dii seet...", aiTitle: "Baobab AI", aiThink: "Xalaat bi... ", aiBtn: "Laj Baobab AI", aiSources: "Lëndëm yi", footer: "Def nañ ko ak bégg. Baobab, garab xam-xam." }
 };
 
 // THÈMES
@@ -54,7 +57,7 @@ function toggleTheme() {
   applyTheme();
 }
 
-// RECHERCHE WIKIPEDIA
+// RECHERCHE
 async function performSearch() {
   const query = $('#searchInput').value.trim();
   if(!query) return;
@@ -67,7 +70,7 @@ async function performSearch() {
   displayResults(wikiResults, query);
 
   if(currentSecurity!== 'strong') {
-    runBaobabAI(query); // L'IA va résumer Wikipedia
+    runBaobabAI(query);
   }
 }
 
@@ -93,7 +96,7 @@ function displayResults(results, query) {
   `).join('');
 }
 
-// BAOBAB IA SANS CLÉ - IL RÉSUME WIKIPEDIA
+// BAOBAB IA AVEC GOOGLE GEMINI
 async function runBaobabAI(query) {
   const aiBlock = $('#aiBlock');
   if(currentSecurity === 'strong') { aiBlock.classList.add('hidden'); return; }
@@ -102,21 +105,24 @@ async function runBaobabAI(query) {
   $('#aiBtn').classList.add('hidden');
 
   try {
-    // On prend le 1er résultat Wikipedia et on le "résume"
-    const res = await fetch(`https://fr.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles=${encodeURIComponent(query)}&format=json&origin=*`);
-    const data = await res.json();
-    const pages = data.query.pages;
-    const pageId = Object.keys(pages)[0];
-    let extract = pages[pageId].extract || "Désolé, je n'ai rien trouvé sur ça.";
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{text: `Tu es Baobab IA, un assistant de recherche pour l'Afrique. Réponds en ${currentLang}. Sois utile et chaleureux. Question: ${query}`}]
+        }]
+      })
+    });
 
-    // On coupe pour faire un résumé
-    if(extract.length > 600) extract = extract.substring(0, 600) + "...";
+    if(!response.ok) throw new Error("Erreur API Google");
 
-    $('#aiText').innerText = extract;
-    $('#aiSources').innerHTML = `<span>Source: Wikipedia</span>`;
+    const data = await response.json();
+    $('#aiText').innerText = data.candidates[0].content.parts[0].text;
+    $('#aiSources').innerHTML = `<span>Source: Google Gemini</span>`;
     $('#aiBtn').classList.remove('hidden');
   } catch (error) {
-    $('#aiText').innerText = "Baobab n'a pas trouvé d'info. Essaie une autre question.";
+    $('#aiText').innerText = "Erreur: Vérifie ta clé Google et que l'API Gemini est activée.";
     $('#aiBtn').classList.remove('hidden');
   }
-}
+          }
