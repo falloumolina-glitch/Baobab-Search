@@ -1,79 +1,136 @@
-const $ = s => document.querySelector(s);
-let currentLang = localStorage.getItem('baobabLang') || 'fr-FR';
-let currentSecurity = localStorage.getItem('baobabSecurity') || 'standard';
+// ========================================
+// BAOBAB SEARCH - VERSION AVEC IA GROQ
+// ========================================
 
-// RÈGLE D'OR : METS TA VRAIE CLÉ ICI ENTRE LES ""
-const GEMINI_API_KEY = "AIzaSyD6aTPeBpKTBFNNT6LOaXbfmpMG7XWl2V4";
+// COLLE TA CLÉ GROQ ICI. Elle commence par gsk_
+const GEMINI_API_KEY = "AQ.Ab8RN6L6XnRBAiaSRhJd3UTg0-iep0d1I93rUQVgeLSgqSlipA"; 
 
+let currentLang = 'fr';
+let currentSecurity = 'balanced';
+let currentTheme = 'light';
+
+const $ = (id) => document.getElementById(id);
+
+// TRADUCTIONS
 const translations = {
-  'fr-FR': {searchPlaceholder: "Recher sur Baobab...", settings: "Paramètres", langSearch: "Langue de recherche:", saveActivity: "Enregistrer l'activité", clearHistory: "Effacer l'historique récent", security: "Sécurité", back: "Retour", speakNow: "Parlez maintenant..."},
-  'en-US': {searchPlaceholder: "Search on Baobab...", settings: "Settings", langSearch: "Search language:", saveActivity: "Save activity", clearHistory: "Clear recent history", security: "Security", back: "Back", speakNow: "Speak now..."},
-  'es-ES': {searchPlaceholder: "Buscar en Baobab...", settings: "Configuración", langSearch: "Idioma de búsqueda:", saveActivity: "Guardar actividad", clearHistory: "Borrar historial reciente", security: "Seguridad", back: "Atrás", speakNow: "Hable ahora..."}
+  fr: { title: "Baobab Search", tagline: "La recherche africaine, intelligente et respectueuse.", placeholder: "Pose ta question à Baobab...", searching: "Recherche en cours...", aiTitle: "Baobab IA", aiThink: "Réflexion de Baobab IA...", aiBtn: "Demander à Baobab IA", aiSources: "Sources", footer: "Fait avec ❤️ pour l'Afrique. Inspiré par le Baobab, arbre de sagesse." },
+  wo: { title: "Baobab Seet", tagline: "Seetug Afrik bi, xel te jàmm.", placeholder: "Laj Baobab...", searching: "Dii seet...", aiTitle: "Baobab AI", aiThink: "Xalaat bi... ", aiBtn: "Laj Baobab AI", aiSources: "Lëndëm yi", footer: "Def nañ ko ak bégg. Baobab, garab xam-xam." }
 };
 
+// THÈMES
+const themes = {
+  light: { '--bg': '#F8F5F0', '--text': '#2D241F', '--accent': '#A0522D', '--card': '#FFFFFF', '--border': '#E0DAD1' },
+  dark: { '--bg': '#1A1612', '--text': '#F8F5F0', '--accent': '#D4A373', '--card': '#2D241F', '--border': '#4A3F35' }
+};
+
+// AU DÉMARRAGE
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
+  applyTranslations();
+  $('#searchBtn').addEventListener('click', performSearch);
+  $('#searchInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(); });
+  $('#aiBtn').addEventListener('click', () => runBaobabAI($('#searchInput').value));
+  $('#langSelect').addEventListener('change', (e) => { currentLang = e.target.value; applyTranslations(); });
+  $('#securitySelect').addEventListener('change', (e) => { currentSecurity = e.target.value; });
+  $('#themeToggle').addEventListener('click', toggleTheme);
+});
+
 function applyTranslations() {
-  const t = translations[currentLang] || translations['fr-FR'];
-  document.documentElement.lang = currentLang.split('-')[0];
-  if($('#searchInput')) $('#searchInput').placeholder = t.searchPlaceholder;
-  if($('#searchInput2')) $('#searchInput2').placeholder = t.searchPlaceholder;
-  document.querySelectorAll('[data-i18n]').forEach(el => {const key = el.getAttribute('data-i18n'); if(t[key]) el.textContent = t[key];});
+  const t = translations[currentLang];
+  $('#logoTitle').innerText = t.title;
+  $('#tagline').innerText = t.tagline;
+  $('#searchInput').placeholder = t.placeholder;
+  $('#aiTitle').innerText = t.aiTitle;
+  $('#aiBtn').innerText = t.aiBtn;
+  $('#aiSourcesLabel').innerText = t.aiSources + ":";
+  $('#footerText').innerText = t.footer;
 }
 
-function showPage(id) {document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $(`#${id}`).classList.add('active'); applyTranslations();}
-function goHome() {showPage('home'); loadHistory(); if($('#langSelect')) $('#langSelect').value = currentLang; if($('#securityMode')) $('#securityMode').value = currentSecurity;}
-function loadHistory() {let h = JSON.parse(localStorage.getItem('hist') || '[]'); if($('#historyList')) $('#historyList').innerHTML = h.map(i => `<div class="item" onclick="selectSuggest('${i}')">${i}</div>`).join('');}
-function selectSuggest(text) {$('#searchInput').value = text; search();}
-function saveHistory(q) {if(!$('#saveActivity')?.checked) return; let h = JSON.parse(localStorage.getItem('hist') || '[]'); localStorage.setItem('hist', JSON.stringify([q,...h.filter(x => x!== q)].slice(0,5))); loadHistory();}
-function clearHistory() {localStorage.removeItem('hist'); loadHistory();}
-
-async function search() {
-  let q = $('#searchInput')?.value || $('#searchInput2')?.value;
-  if(!q) return;
-  $('#searchInput2').value = q;
-  saveHistory(q);
-  showPage('results');
-  runBaobabAI(q);
-  $('#resultsList').innerHTML = `<div class="result-card"><div class="url">baobabsearch.com/search?q=${q}</div><a class="title">Résultats pour <b>${q}</b></a><div class="desc">Ici viendront les vrais résultats des sites web.</div></div>`;
+function applyTheme() {
+  const theme = themes[currentTheme];
+  for(const key in theme) { document.documentElement.style.setProperty(key, theme[key]); }
+  $('#themeToggle').innerText = currentTheme === 'light'? '🌙' : '☀️';
 }
 
+function toggleTheme() {
+  currentTheme = currentTheme === 'light'? 'dark' : 'light';
+  applyTheme();
+}
+
+// RECHERCHE
+async function performSearch() {
+  const query = $('#searchInput').value.trim();
+  if(!query) return;
+  
+  $('#results').innerHTML = `<p>${translations[currentLang].searching}</p>`;
+  $('#aiBlock').classList.add('hidden');
+  $('#aiBtn').classList.remove('hidden');
+
+  // ICI ON APPELLE WIKIPEDIA + IA
+  const wikiResults = await searchWikipedia(query);
+  displayResults(wikiResults, query);
+  
+  // On lance l'IA en fond
+  if(currentSecurity!== 'strong') {
+    runBaobabAI(query);
+  }
+}
+
+async function searchWikipedia(query) {
+  const lang = currentLang === 'wo'? 'fr' : currentLang; // Wikipedia wolof limité
+  const url = `https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.query.search.slice(0, 5);
+  } catch(e) { return []; }
+}
+
+function displayResults(results, query) {
+  if(results.length === 0) {
+    $('#results').innerHTML = `<p>Aucun résultat trouvé pour "${query}"</p>`;
+    return;
+  }
+  $('#results').innerHTML = results.map(r => `
+    <div class="result-card">
+      <h3><a href="https://fr.wikipedia.org/?curid=${r.pageid}" target="_blank">${r.title}</a></h3>
+      <p>${r.snippet.replace(/<[^>]*>/g, '')}...</p>
+    </div>
+  `).join('');
+}
+
+// BAOBAB IA AVEC GROQ
 async function runBaobabAI(query) {
   const aiBlock = $('#aiBlock');
   if(currentSecurity === 'strong') { aiBlock.classList.add('hidden'); return; }
   aiBlock.classList.remove('hidden');
-  $('#aiText').innerText = `Réflexion de Baobab IA...`;
+  $('#aiText').innerText = translations[currentLang].aiThink;
   $('#aiBtn').classList.add('hidden');
 
-  if(GEMINI_API_KEY === "AIzaSyTA_CLE_QUE_TU_AS_COPIE" || GEMINI_API_KEY.length < 20){
-    $('#aiText').innerText = "ERREUR: Colle ta VRAIE clé API dans script.js ligne 5";
-    return;
-  }
-
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({contents: [{parts: [{ text: `Tu es Baobab IA. Réponds en ${currentLang} à: ${query}` }]}]})
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Authorization': `Bearer ${GEMINI_API_KEY}` 
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: [
+          {role: "system", content: `Tu es Baobab IA, un assistant de recherche pour l'Afrique. Réponds de manière claire, utile et chaleureuse en ${currentLang}. Donne des infos concrètes.`},
+          {role: "user", content: query}
+        ]
+      })
     });
+    
+    if(!response.ok) throw new Error("API Error");
+    
     const data = await response.json();
-    $('#aiText').innerText = data.candidates[0].content.parts[0].text;
-    $('#aiSources').innerHTML = `<span>Source: Gemini 1.5 Flash</span>`;
+    $('#aiText').innerText = data.choices[0].message.content;
+    $('#aiSources').innerHTML = `<span>Source: Llama 3 par Groq</span>`;
     $('#aiBtn').classList.remove('hidden');
-  } catch (error) { $('#aiText').innerText = "Erreur API. Vérifie ta clé."; }
-}
-
-function expandAI(){ $('#aiBtn').classList.add('hidden');}
-function startVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { alert("Micro non supporté"); return; }
-  const t = translations[currentLang]; recognition = new SpeechRecognition();
-  recognition.lang = currentLang; recognition.onstart = () => { $('#searchInput').placeholder = t.speakNow; };
-  recognition.onresult = (e) => {$('#searchInput').value = e.results[0][0].transcript; $('#searchInput').placeholder = t.searchPlaceholder; search();};
-  recognition.onend = () => { $('#searchInput').placeholder = t.searchPlaceholder; }; recognition.start();
-}
-function startImageSearch() {let input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = e => {let file = e.target.files[0]; if (!file) return; $('#searchInput').value = "recherche par image: " + file.name; search();}; input.click();}
-
-document.addEventListener('DOMContentLoaded', () => {
-  if($('#langSelect')){ $('#langSelect').value = currentLang; applyTranslations(); $('#langSelect').addEventListener('change', (e) => {currentLang = e.target.value; localStorage.setItem('baobabLang', currentLang); applyTranslations();});}
-  if($('#securityMode')) {$('#securityMode').value = currentSecurity; $('#securityMode').addEventListener('change', (e) => {currentSecurity = e.target.value; localStorage.setItem('baobabSecurity', currentSecurity);});}
-});
-goHome();
+  } catch (error) { 
+    $('#aiText').innerText = "Erreur API. Vérifie que ta clé gsk_ est bien collée ligne 5."; 
+    $('#aiBtn').classList.remove('hidden');
+  }
+       }
