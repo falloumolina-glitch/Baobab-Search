@@ -20,11 +20,6 @@ function search() {
     <div class="url">wikipedia.org › wiki › ${q.replace(' ', '_')}</div>
     <a class="title">Résultat pour <b>${q}</b> - Baobab Search</a>
     <div class="desc">Voici les informations concernant <b>${q}</b>. L'histoire du <b>Sénégal</b> s'étend sur plusieurs millénaires...</div>
-  </div>
-  <div class="result-card">
-    <div class="url">baobab.sn › info › ${q.replace(' ', '-')}</div>
-    <a class="title"><b>${q}</b> : Tout ce qu'il faut savoir</a>
-    <div class="desc">Découvrez tout sur <b>${q}</b>. Actualités, images, et analyses détaillées.</div>
   </div>`;
 }
 
