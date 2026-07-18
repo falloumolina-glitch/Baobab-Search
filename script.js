@@ -3,7 +3,7 @@
 // ========================================
 
 // 1. COLLE TA CLÉ GOOGLE CLOUD ICI
-const GEMINI_API_KEY = "COLLE_TA_CLE_GOOGLE_ICI";
+const GEMINI_API_KEY = "AIzaSyD6aTPeBpKTBFNNT6LOaXbfmpMG7XWl2V4";
 
 let currentLang = 'fr';
 let currentSecurity = 'balanced';
