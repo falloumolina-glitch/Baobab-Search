@@ -5,62 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Baobab Search</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="light">
+<body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo-small" onclick="goHome()">BS</div>
-    <button class="icon-btn" onclick="showPage('settings')">⚙️</button>
+  <header class="header">
+    <div class="logo" onclick="goHome()">BS</div>
+    <div class="header-actions">
+      <button onclick="toggleTheme()" class="icon-btn">🌙</button>
+      <button onclick="showPage('settings')" class="icon-btn">⚙️</button>
+    </div>
   </header>
 
-  <!-- 1. ECRAN ACCUEIL -->
   <main id="home" class="page active">
-    <div class="home-center">
-      <div class="logo-big">BS</div>
+    <div class="home-wrapper">
+      <div class="logo-home">BS</div>
       <h1>Baobab <span>Search</span></h1>
-      
-      <form onsubmit="search(event)" class="search-box">
-        <span class="icon-loupe">🔍</span>
-        <input id="searchInput" type="text" placeholder="Rechercher sur Baobab">
-        <button type="submit" class="btn-q">Q</button>
+      <form onsubmit="search(event)" class="search-bar">
+        <span>🔍</span>
+        <input id="searchInput" type="text" placeholder="Recher sur Baobab ou saisir une URL">
+        <button type="submit">Q</button>
       </form>
-
       <div class="shortcuts">
-        <button onclick="quickSearch('actualités')">📰 Actualités</button>
-        <button onclick="quickSearch('images')">🖼️ Images</button>
-        <button onclick="quickSearch('vidéos')">▶️ Vidéos</button>
-        <button onclick="quickSearch('baobab ai')">✨ Baobab AI</button>
+        <a onclick="quickSearch('actualités')">📰 Actualités</a>
+        <a onclick="quickSearch('images')">🖼️ Images</a>
+        <a onclick="quickSearch('vidéos')">▶️ Vidéos</a>
+        <a onclick="quickSearch('baobab ai')">✨ Baobab AI</a>
       </div>
     </div>
   </main>
 
-  <!-- 2. PAGE RESULTATS -->
   <main id="results" class="page">
-    <div class="filters">
-      <button onclick="filter('all')" class="active">Tout</button>
-      <button onclick="filter('images')">Images</button>
-      <button onclick="filter('videos')">Vidéos</button>
-      <button onclick="filter('news')">Actualités</button>
-      <button onclick="filter('docs')">Documents</button>
+    <div class="results-header">
+      <div class="filters">
+        <button class="active">Tout</button><button>Images</button><button>Vidéos</button><button>Actu</button><button>Docs</button>
+      </div>
     </div>
-    <div id="resultsList" class="results"></div>
+    <div id="resultsList" class="results-container"></div>
   </main>
 
-  <!-- 3. MENU PARAMETRES -->
   <main id="settings" class="page">
     <h2>Paramètres</h2>
-    <div class="setting">
-      <span>🌙 Mode sombre / clair</span>
-      <button onclick="toggleTheme()">Changer</button>
+    <div class="settings-list">
+      <div class="setting-item"><span>🌙 Apparence</span><select onchange="setTheme(this.value)"><option value="light">Clair</option><option value="dark">Sombre</option></select></div>
+      <div class="setting-item"><span>🌍 Langue</span><select><option>Français</option><option>Wolof</option><option>English</option></select></div>
+      <div class="setting-item"><span>🔒 Confidentialité</span><p>Baobab ne vend pas vos données</p></div>
+      <div class="setting-item"><span>🕒 Historique</span><button onclick="clearHistory()">Effacer</button></div>
+      <div class="setting-item"><span>ℹ️ À propos</span><p>Baobab Search v0.1 Pro</p></div>
     </div>
-    <div class="setting"><span>🌍 Langue</span> <select><option>Français</option><option>English</option></select></div>
-    <div class="setting"><span>🔒 Confidentialité</span></div>
-    <div class="setting"><span>🕒 Historique de recherche</span> <button onclick="clearHistory()">Effacer</button></div>
-    <div class="setting"><span>ℹ️ À propos de Baobab Search</span> <p>Version 0.1</p></div>
-    <button class="back" onclick="goHome()">← Retour</button>
   </main>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
           </html>
