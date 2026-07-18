@@ -1,27 +1,47 @@
 :root {
-  --bg-light: #FFFFFF; --text-light: #202124; --primary: #2563EB; --gray-light: #F1F3F4; --border: #DADCE0;
-  --bg-dark: #202124; --card-dark: #303134; --text-dark: #FFFFFF; --primary-dark: #8AB4F8;
+  --bg: #FFFFFF; --text: #202124; --primary: #2563EB; --gray: #F1F3F4; --url: #006621;
 }
-body { font-family: 'Inter', sans-serif; }
-.font-sora { font-family: 'Sora', sans-serif; }
-.page { display: none; animation: fadeIn 0.3s ease-in-out; }
+body.dark {
+  --bg: #202124; --text: #FFFFFF; --gray: #303134; --url: #81C995;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+body { background: var(--bg); color: var(--text); }
+
+header { display: flex; justify-content: space-between; padding: 12px 20px; }
+.logo-small { width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: grid; place-items: center; font-weight: bold; cursor: pointer; }
+.icon-btn { font-size: 20px; background: none; border: none; cursor: pointer; }
+
+.page { display: none; padding: 20px; }
 .page.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.btn-primary { background: var(--primary); color: white; padding: 10px 24px; border-radius: 8px; font-weight: 500; }
-.btn-primary:hover { background: #1D4ED8; }
-.btn-secondary { background: var(--gray-light); color: var(--text-light); padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border); }
-.dark.btn-secondary { background: var(--card-dark); color: var(--text-dark); }
-.icon-btn { padding: 8px; border-radius: 50%; }
-.icon-btn:hover { background: var(--gray-light); }
-.dark.icon-btn:hover { background: var(--card-dark); }
-.tab-btn { padding: 12px 0; border-bottom: 2px solid transparent; color: #5F6368; font-size: 14px; white-space: nowrap; }
-.tab-btn.active { border-color: var(--primary); color: var(--primary); font-weight: 500; }
-.dark.tab-btn.active { border-color: var(--primary-dark); color: var(--primary-dark); }
-.result-item { padding: 8px 0; }
-.result-title { color: var(--primary); font-size: 20px; line-height: 1.3; }
-.result-title:hover { text-decoration: underline; }
-.dark.result-title { color: var(--primary-dark); }
-.result-url { color: #006621; font-size: 14px; }
-.dark.result-url { color: #81C995; }
-.result-desc { color: var(--text-light); font-size: 14px; }
-.dark.result-desc { color: #BDC1C6; }
+
+.home-center { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 85vh; text-align: center; }
+.logo-big { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 20px; display: grid; place-items: center; font-size: 40px; font-weight: bold; margin-bottom: 10px; }
+h1 span { color: var(--primary); }
+
+.search-box { display: flex; align-items: center; width: 90%; max-width: 600px; border: 1px solid var(--gray); border-radius: 24px; padding: 4px 16px; margin: 25px 0; }
+.search-box input { flex: 1; border: none; outline: none; background: transparent; color: var(--text); font-size: 16px; padding: 12px 8px; }
+.btn-q { background: var(--primary); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; font-weight: bold; cursor: pointer; }
+
+.shortcuts { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.shortcuts button { padding: 10px 16px; border: 1px solid var(--gray); background: var(--gray); border-radius: 8px; cursor: pointer; font-size: 14px; }
+
+.filters { display: flex; gap: 15px; border-bottom: 1px solid var(--gray); padding-bottom: 10px; overflow-x: auto; }
+.filters button { background: none; border: none; padding: 8px 0; cursor: pointer; white-space: nowrap; }
+.filters button.active { border-bottom: 2px solid var(--primary); color: var(--primary); font-weight: bold; }
+
+.results { max-width: 700px; margin: 20px auto; text-align: left; }
+.result { margin-bottom: 25px; }
+.result a.title { color: var(--primary); font-size: 18px; text-decoration: none; }
+.result a.title:hover { text-decoration: underline; }
+.result .url { color: var(--url); font-size: 14px; }
+.result .desc { font-size: 14px; margin-top: 4px; }
+
+.setting { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--gray); }
+.back { margin-top: 20px; padding: 10px 20px; background: var(--gray); border: none; border-radius: 8px; cursor: pointer; }
+
+/* MOBILE FIRST */
+@media (max-width: 600px) {
+  .logo-big { width: 60px; height: 60px; font-size: 30px; }
+  .search-box { width: 95%; }
+  .shortcuts button { font-size: 13px; padding: 8px 12px; }
+       }
