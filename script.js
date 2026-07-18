@@ -1,7 +1,7 @@
 const $ = s => document.querySelector(s);
 let currentLang = localStorage.getItem('baobabLang') || 'fr-FR';
 let currentSecurity = localStorage.getItem('baobabSecurity') || 'standard';
-const GEMINI_API_KEY = "COLLE_TA_CLE_ICI";"; // <-- COLLE TA CLE ICI
+const GEMINI_API_KEY = "COLLE_TA_CLE_ICI"; // <-- COLLE TA CLE ICI
 
 const translations = {
   'fr-FR': {searchPlaceholder: "Recher sur Baobab...", settings: "Paramètres", general: "Général", langSearch: "Langue de recherche:", region: "Région:", safeSearch: "SafeSearch", privacy: "Vie privée & Historique", saveActivity: "Enregistrer l'activité", clearHistory: "Effacer l'historique récent", appearance: "Apparence", theme: "Thème:", light: "Clair", dark: "Sombre", system: "Système", fontSize: "Taille du texte:", small: "Petit", medium: "Moyen", large: "Grand", back: "Retour", recent: "Historique récent", suggestions: "Suggestions", all: "Tous", images: "Images", videos: "Vidéos", news: "Actualités", maps: "Maps", speakNow: "Parlez maintenant...", legal: "Légal", privacyPolicy: "Politique de confidentialité", termsOfService: "Conditions d'utilisation", about: "À propos", aboutBaobab: "À propos de Baobab Search", security: "Sécurité et Confidentialité", protectionMode: "Mode de protection:", standard: "Standard", strong: "Renforcé", strongHelp: "Mode Renforcé : Aucune donnée n'est enregistrée. SafeSearch activé."},
